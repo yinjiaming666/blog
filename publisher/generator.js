@@ -7,7 +7,7 @@
   const BASE_URL = 'https://yinjiaming666.github.io/blog/';
   const SITE_NAME = 'yinjiaming的博客';
   const AUTHOR = 'yinjiaming';
-  const SITE_DESCRIPTION = 'yinjiaming的博客，记录 Go、PHP、Flutter、Vue 和前端开发中的技术实践、问题排查与解决方法。';
+  const SITE_DESCRIPTION = 'yinjiaming的博客，记录日常开发中的技术实践、问题排查与解决方法。';
   const SHARE_IMAGE = BASE_URL + 'social-card.png';
   const esc = (value) => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
