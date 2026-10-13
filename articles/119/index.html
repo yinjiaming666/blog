@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>flutter 组件和生命周期 · 技术笔记</title>
+<meta name="description" content="flutter 组件和生命周期 - 前端">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/119/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/frontend/index.html">前端</a></p><h1>flutter 组件和生命周期</h1><p class="post-meta"><time datetime="2025-07-18">2025-07-18</time> · 前端</p><article class="prose">
+<p><code>StatelessWidget</code> 和 <code>StatefulWidget</code> 都继承于 <code>Widget</code>,flutter文档中说明 Widget是不可变的,可以在源码中<code>Widget</code>左上角有一个
+<code>@immutable</code>注解，这个注解的意思是所有的属性必须是final修饰，也就是Widget一旦初始化以后，其属性将不可变。</p>
+<h2><code>StatelessWidget</code></h2>
+<p>内容被创建出来之后，就不能再改变了，适合纯静态的组件</p>
+<h3>生命周期</h3>
+<p>只有 <code>build</code> 初始化之后就没操作了</p>
+<h2><code>StatefulWidget</code></h2>
+<blockquote>
+<p>每次 setState 都会重绘一次组件</p>
+</blockquote>
+<ul>
+<li>
+StatelessWidget和StatefulWidget没有本质区别，他们的所有属性都是不可变的。它们都没法更新，除非用一个新的Widget去替换它们。
+</li>
+<li>
+StatefulWidget拥有一个可变的State。
+</li>
+</ul>
+
+<h3>生命周期</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>initState</td>
+<td>初始化 相当于 onLoad</td>
+</tr>
+<tr>
+<td>build</td>
+<td>返回需要渲染的 Widget</td>
+</tr>
+<tr>
+<td>deactivate</td>
+<td>当 State 对象从树中暂时移除时调用</td>
+</tr>
+<tr>
+<td>dispose</td>
+<td>永久移除，执行最终清理</td>
+</tr>
+<tr>
+<td>didUpdateWidget</td>
+<td>父组件重绘，导致当前 StatefulWidget 组件调用 build 重绘</td>
+</tr>
+</tbody>
+</table>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

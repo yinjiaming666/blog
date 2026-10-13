@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>支付宝回调验签失败 · 技术笔记</title>
+<meta name="description" content="支付宝回调验签失败 - PHP">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/117/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/php/index.html">PHP</a></p><h1>支付宝回调验签失败</h1><p class="post-meta"><time datetime="2025-06-20">2025-06-20</time> · PHP</p><article class="prose">
+<p>支付宝回调数据。通常是双引号被转义了，导致验签失败</p>
+<pre><code class="language-json">{
+  &quot;gmt_create&quot;: &quot;2025-06-20 16:19:46&quot;,
+  &quot;charset&quot;: &quot;utf-8&quot;,
+  &quot;seller_email&quot;: &quot;896801796@qq.com&quot;,
+  &quot;subject&quot;: &quot;购买商品&quot;,
+  &quot;sign&quot;: &quot;&quot;,
+  &quot;invoice_amount&quot;: &quot;0.01&quot;,
+  &quot;buyer_open_id&quot;: &quot;074sFsjG8ZjBvMq38Y5pBGNyA2Uptp7iuCW2Qk5g-yPLRI9&quot;,
+  &quot;notify_id&quot;: &quot;&quot;,
+  &quot;fund_bill_list&quot;: &quot;[{&amp;quot;amount&amp;quot;:&amp;quot;0.01&amp;quot;,&amp;quot;fundChannel&amp;quot;:&amp;quot;ALIPAYACCOUNT&amp;quot;}]&quot;,
+  &quot;notify_type&quot;: &quot;trade_status_sync&quot;,
+  &quot;trade_status&quot;: &quot;TRADE_SUCCESS&quot;,
+  &quot;receipt_amount&quot;: &quot;0.01&quot;,
+  &quot;buyer_pay_amount&quot;: &quot;0.01&quot;,
+  &quot;app_id&quot;: &quot;&quot;,
+  &quot;sign_type&quot;: &quot;RSA2&quot;,
+  &quot;seller_id&quot;: &quot;&quot;,
+  &quot;gmt_payment&quot;: &quot;2025-06-20 16:19:46&quot;,
+  &quot;notify_time&quot;: &quot;2025-06-20 16:44:24&quot;,
+  &quot;merchant_app_id&quot;: &quot;2021005161628362&quot;,
+  &quot;version&quot;: &quot;1.0&quot;,
+  &quot;out_trade_no&quot;: &quot;&quot;,
+  &quot;total_amount&quot;: &quot;0.01&quot;,
+  &quot;trade_no&quot;: &quot;&quot;,
+  &quot;auth_app_id&quot;: &quot;&quot;,
+  &quot;buyer_logon_id&quot;: &quot;&quot;,
+  &quot;point_amount&quot;: &quot;0.00&quot;
+}
+</code></pre>
+<p>解决方法</p>
+<pre><code class="language-php">$res = $this-&gt;request-&gt;post();
+foreach ($res as &amp;$v) {
+    $v = html_entity_decode($v);
+}
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

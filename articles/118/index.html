@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>docker 部署 mysql 和 redis · 技术笔记</title>
+<meta name="description" content="docker 部署 mysql 和 redis - 随笔">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/118/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>docker 部署 mysql 和 redis</h1><p class="post-meta"><time datetime="2025-06-26">2025-06-26</time> · 随笔</p><article class="prose">
+<pre><code class="language-shell">
+docker run -p 63791:6379 --name redis --restart always -d -v /data/redis/redis.conf:/etc/redis/redis.conf -v /data/redis/data:/data  redis /etc/redis/redis.conf
+
+docker run -p 33061:3306 --name mysql --restart always -d -v /data/mysql/conf:/etc/mysql/conf.d -v /data/mysql/logs:/logs -v /data/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7
+
+# mariadb
+# mariadb 10.3 以上对应 mysql5.7
+# mariadb 10.3 以上对应 mysql8
+docker run --name mariadb11 --restart always -p 33063:3306 -e MYSQL_ROOT_PASSWORD=123546 -v /data/mariadb11/data:/var/lib/mysql -d mariadb:11.8.5-ubi9
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

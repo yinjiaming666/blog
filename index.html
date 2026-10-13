@@ -1,33 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="个人技术博客，记录开发笔记与学习心得。" />
-  <title>我的个人博客</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      background: #f8fafc;
-      color: #0f172a;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    main { max-width: 580px; width: 100%; }
-    h1 { font-size: clamp(2rem, 6vw, 3rem); margin: 0 0 16px; }
-    p { color: #475569; font-size: 1.1rem; line-height: 1.8; }
-    .label { font-size: .9rem; letter-spacing: .08em; color: #2563eb; font-weight: 600; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>首页 · 技术笔记</title>
+<meta name="description" content="Go、PHP、前端开发与日常技术笔记">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main>
-    <div class="label">PERSONAL BLOG</div>
-    <h1>欢迎来到我的博客</h1>
-    <p>GitHub Pages 已准备就绪。后续将迁移 Markdown 文章与分类，并接入 Hugo 自动生成博客页面。</p>
-  </main>
+<div class="site-top"><a href="index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="index.html" aria-current="page">首页</a> <span aria-hidden="true">·</span> <a href="archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<h1>技术笔记</h1>
+<p>一些关于编程、系统和日常开发的记录。文章按时间排列，内容来自 Markdown。</p>
+<h2>分类</h2>
+<p class="category-links"><a href="categories/notes/index.html">随笔 (43)</a> <a href="categories/php/index.html">PHP (19)</a> <a href="categories/go/index.html">Go (12)</a> <a href="categories/frontend/index.html">前端 (7)</a></p>
+<h2>最近更新</h2>
+<ul class="post-list">
+<li><time datetime="2026-06-04">2026-06-04</time> <a class="article-title" href="articles/129/index.html">Vue 3 watch computed watchEffect</a> <span class="post-category">[<a href="categories/frontend/index.html">前端</a>]</span></li>
+<li><time datetime="2026-04-17">2026-04-17</time> <a class="article-title" href="articles/128/index.html">css flex: 1; 注意事项</a> <span class="post-category">[<a href="categories/frontend/index.html">前端</a>]</span></li>
+<li><time datetime="2025-12-16">2025-12-16</time> <a class="article-title" href="articles/127/index.html">Flutter RichText 用法</a> <span class="post-category">[<a href="categories/frontend/index.html">前端</a>]</span></li>
+<li><time datetime="2025-12-09">2025-12-09</time> <a class="article-title" href="articles/126/index.html">Redis 事务</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2025-10-29">2025-10-29</time> <a class="article-title" href="articles/125/index.html">flutter 路由监听</a> <span class="post-category">[<a href="categories/frontend/index.html">前端</a>]</span></li>
+<li><time datetime="2025-09-09">2025-09-09</time> <a class="article-title" href="articles/124/index.html">phpStorm 使用技巧</a> <span class="post-category">[<a href="categories/php/index.html">PHP</a>]</span></li>
+<li><time datetime="2025-08-11">2025-08-11</time> <a class="article-title" href="articles/123/index.html">MySQL innodb 数据恢复</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2025-08-01">2025-08-01</time> <a class="article-title" href="articles/122/index.html">进制转换</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2025-07-31">2025-07-31</time> <a class="article-title" href="articles/121/index.html">flutter addPostFrameCallback</a> <span class="post-category">[<a href="categories/frontend/index.html">前端</a>]</span></li>
+<li><time datetime="2025-07-29">2025-07-29</time> <a class="article-title" href="articles/120/index.html">flutter 根据条件显示组件</a> <span class="post-category">[<a href="categories/frontend/index.html">前端</a>]</span></li>
+<li><time datetime="2025-07-18">2025-07-18</time> <a class="article-title" href="articles/119/index.html">flutter 组件和生命周期</a> <span class="post-category">[<a href="categories/frontend/index.html">前端</a>]</span></li>
+<li><time datetime="2025-06-26">2025-06-26</time> <a class="article-title" href="articles/118/index.html">docker 部署 mysql 和 redis</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2025-06-20">2025-06-20</time> <a class="article-title" href="articles/117/index.html">支付宝回调验签失败</a> <span class="post-category">[<a href="categories/php/index.html">PHP</a>]</span></li>
+<li><time datetime="2025-06-20">2025-06-20</time> <a class="article-title" href="articles/116/index.html">mysql 复制表</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2025-06-04">2025-06-04</time> <a class="article-title" href="articles/115/index.html">wsl2 docker 拉取镜像出现 Error response from daemon: Get xxx : proxyconnect tcp: dial xxx connect: connection refused 问题</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2025-05-12">2025-05-12</time> <a class="article-title" href="articles/114/index.html">redis 批量删除指定前缀的key</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2025-05-09">2025-05-09</time> <a class="article-title" href="articles/113/index.html">wsl 使用宿主机代理</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2025-04-07">2025-04-07</time> <a class="article-title" href="articles/112/index.html">PHP 飞船符用法</a> <span class="post-category">[<a href="categories/php/index.html">PHP</a>]</span></li>
+<li><time datetime="2025-01-25">2025-01-25</time> <a class="article-title" href="articles/111/index.html">composer 参数</a> <span class="post-category">[<a href="categories/php/index.html">PHP</a>]</span></li>
+<li><time datetime="2024-12-17">2024-12-17</time> <a class="article-title" href="articles/110/index.html">docker容器内访问宿主机host服务</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2024-11-22">2024-11-22</time> <a class="article-title" href="articles/109/index.html">php 版本管理工具</a> <span class="post-category">[<a href="categories/php/index.html">PHP</a>]</span></li>
+<li><time datetime="2024-08-08">2024-08-08</time> <a class="article-title" href="articles/108/index.html">mysql GROUP_CONCAT 函数长度限制</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2024-06-06">2024-06-06</time> <a class="article-title" href="articles/107/index.html">抖音小游戏接口文档</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2024-06-05">2024-06-05</time> <a class="article-title" href="articles/106/index.html">mysql 最大连接数设置</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+<li><time datetime="2024-05-17">2024-05-17</time> <a class="article-title" href="articles/105/index.html">异或运算符</a> <span class="post-category">[<a href="categories/notes/index.html">随笔</a>]</span></li>
+</ul>
+<p><a href="archive/index.html">查看全部 81 篇文章 »</a></p>
+
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
 </body>
 </html>

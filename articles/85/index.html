@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>分片上传代码示例 · 技术笔记</title>
+<meta name="description" content="分片上传代码示例 - 随笔">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/85/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>分片上传代码示例</h1><p class="post-meta"><time datetime="2024-01-11">2024-01-11</time> · 随笔</p><article class="prose">
+<h1>分片上传</h1>
+<blockquote>
+<p>前端先根据文件大小将文件分割成一个个小文件上传到后端，所有文件上传成功后，后端再把文件进行合并</p>
+</blockquote>
+<h3>前端示例</h3>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Document&lt;/title&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css&quot;
+          integrity=&quot;sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu&quot; crossorigin=&quot;anonymous&quot;&gt;
+    &lt;style&gt;
+        .label-ipt {
+            width: 70px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            background-color: skyblue;
+            border-radius: 3px;
+        }
+
+        #preview {
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            margin: 10px 0;
+            border: 1px solid rgb(24, 81, 160)
+        }
+
+        #img {
+            width: 100%
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;progress&quot;&gt;
+    &lt;div id=&quot;progress&quot; class=&quot;progress-bar&quot; role=&quot;progressbar&quot; aria-valuenow=&quot;60&quot; aria-valuemin=&quot;5&quot; aria-valuemax=&quot;100&quot;
+         style=&quot;width: 5%;&quot;&gt;
+        0%
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;form id=&quot;form&quot;&gt;
+    &lt;input id=&quot;iptfile&quot; class=&quot;intfile&quot; type=&quot;file&quot;&gt;
+    &lt;label for=&quot;iptfile&quot; class=&quot;label-ipt&quot;&gt;选择文件&lt;/label&gt;
+    &lt;div id=&quot;preview&quot;&gt;&lt;/div&gt;
+    &lt;input type=&quot;submit&quot;&gt;
+&lt;/form&gt;
+&lt;div&gt;
+    &lt;img src=&quot;&quot; alt=&quot;&quot; id=&quot;img&quot;&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+    const form = document.querySelector('#form')
+    const img = document.querySelector('#img')
+    const ipt = document.querySelector('#iptfile')
+    const divPreview = document.querySelector(&quot;#preview&quot;)
+    let file = null;
+    let fileName = (Date.now() + rand(1000, 9999)).toString();
+    let ext = '';
+
+    function rand(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    let sliceNum = 0; // 切片数量
+    let hasUploadNum = 0; // 已经上传切片数量
+
+    /**
+     * @returns {File[]}
+     * @param file
+     */
+    function sliceFile(file) {
+        // 切成多大一份
+        let uploadSize = 1024 * 1024
+        let arr = []
+        for (let i = 0; i &lt; file.size; i += uploadSize) {
+            const index = (i / uploadSize) + 1
+            // 文件切片  截取返回的是一个二进制文件
+            arr.push(file.slice(i, uploadSize * index))
+        }
+        sliceNum = arr.length;
+        return arr;
+    }
+
+    // 预览功能 隐藏input元素
+    ipt.style.opacity = 0;
+    ipt.addEventListener('change', (e) =&gt; {
+        ext = '.' + e.target.files[0].name.split('.').pop().toLowerCase();
+        file = new File([e.target.files[0]], fileName);
+        divPreview.innerText = `FileName: ${file.name}, size: ${getSize(file)}`
+    })
+
+    // 格式化获取文件大小的函数
+    function getSize(file) {
+        // 传入文件对象files，一般就是FileList对象按索引来取一个对象
+        // files.size读取文件大小
+        const aMultiples = [&quot;KiB&quot;, &quot;MiB&quot;, &quot;GiB&quot;, &quot;TiB&quot;, &quot;PiB&quot;, &quot;EiB&quot;, &quot;ZiB&quot;, &quot;YiB&quot;];
+        let fSize = file.size
+        let outSize = fSize + 'bytes'
+        let nMult;
+        for (fSize /= 1024, nMult = 0; fSize &gt; 1; fSize /= 1024, nMult++) {
+            outSize = fSize.toFixed(3) + aMultiples[nMult]
+        }
+        return outSize
+    }
+
+    // 发起上传文件的post请求
+    function sendFile(file, sort) {
+        let xhr = new XMLHttpRequest();
+        let fd = new FormData();
+        fd.append('file', file);
+        fd.append('sort', sort);
+        fd.append('num', sliceNum);
+        xhr.open('POST', 'http://app.ycfhtc.com:9080/server/login/uploadSliceFile', true)
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 &amp;&amp; xhr.status === 200) {
+                // 上传成功
+                hasUploadNum = hasUploadNum + 1;
+                let divPro = document.querySelector('#progress')
+                divPro.style.width = hasUploadNum / sliceNum * 100 + '%'
+                divPro.innerText = hasUploadNum / sliceNum * 100 + '%'
+                console.log('请求成功, 数据为：', xhr.responseText);
+                // if (hasUploadNum === sliceNum) {
+                //     // 调用合并文件接口
+                //     let xhr = new XMLHttpRequest();
+                //     xhr.open('POST', 'http://app.ycfhtc.com:9080/server/login/mergeSliceFile', true);
+                //     let fd = new FormData();
+                //     fd.append('name', fileName);
+                //     xhr.send(fd);
+                // }
+            }
+        }
+        xhr.send(fd)
+    }
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        let arr = sliceFile(file);
+        for (let i = 0; i &lt; arr.length; i++) {
+            let f = new File([arr[i]], '2024-01-10/' + fileName + ext);
+            await sendFile(f, i + 1);
+        }
+    });
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h3>后端示例</h3>
+<pre><code class="language-php">/**
+ * 分片上传文件
+ * @param Request $request
+ * @param $response
+ * @param $redisCli
+ * @param $mysql
+ * @return array
+ * @throws Exception
+ * @author yin
+ * @ApiTitle  (分片上传文件)
+ * @ApiMethod (POST)
+ * @ApiRoute  ({{url}}/server/login/uploadSliceFile)
+ * @ApiParams (key=sort, value=1, type=text, nullable=false, description=当前是第几个)
+ * @ApiParams (key=num, value=1, type=text, nullable=false, description=一共几个)
+ * @ApiParams (key=file, value=, type=file, nullable=false, description=命名规则（2024-01-10/1114441555999.mp4）)
+ * @ApiQuery  (key=jwt, value={{jwt}}, type=text, nullable=false, description=)
+ */
+public static function uploadSliceFile(Request $request, $response, $redisCli, $mysql): array
+{
+    $sort = $request-&gt;postInt('sort'); // 当前是第几个
+    $num = $request-&gt;postInt('num'); // 一共几个
+
+    $rootPath = dirname(__FILE__, 3) . '/nginx/static/slice_temp/';
+    $file = $request-&gt;getRequest()-&gt;files['file'];
+    $fileTmpPath = $file['tmp_name'];
+
+    $file['name'] = explode('/', $file['name']);
+    $file['name'] = end($file['name']); // 1114441555999.mp4
+    var_dump($file['name']);
+    $ext = explode('.', $file['name']);
+    $ext = end($ext); // 文件类型 mp4
+
+    $name = explode('.', $file['name']);
+    $name = $name[0]; // 1114441555999
+    $folderName = $rootPath . $name . DIRECTORY_SEPARATOR; // /nginx/static/slice_temp/1114441555999/
+    if (!file_exists($folderName)) {
+        mkdir($folderName, 0777, true);
+    }
+    $localFileName = $folderName . &quot;$sort.$ext&quot;; // /nginx/static/slice_temp/1114441555999/1.mp4
+    if (file_exists($localFileName)) {
+        return Utils::responseFail([], 10001, '重复上传的切片');
+    }
+    $res = move_uploaded_file($fileTmpPath, $localFileName);
+
+    if (!$res) {
+        return Utils::responseFail([], 10001, '文件上传失败');
+    }
+
+    Timer::after(3600 * 1000, function () use ($folderName) {
+        // 超时释放资源
+        Utils::delDir($folderName);
+    });
+
+    if ($num === count(scandir($folderName)) - 2) {
+        // 合并文件
+        $readAllFile = function (string $folder) {
+            $handler = opendir($folder);
+            $arr = [];
+            while (($filename = readdir($handler)) !== false) {
+                if ($filename != '.' &amp;&amp; $filename != '..' &amp;&amp; $filename !== '') {
+                    $arr[] = $filename;
+                }
+            }
+            closedir($handler);
+            // 给文件排序
+            for ($i = 0; $i &lt; count($arr); $i++) {
+                for ($j = $i + 1; $j &lt; count($arr); $j++) {
+                    if (intval($arr[$i]) &gt; intval($arr[$j])) {
+                        $tmp = $arr[$i]; // 这里的tmp是临时变量
+                        $arr[$i] = $arr[$j]; // 第一次更换位置
+                        $arr[$j] = $tmp; // 完成位置互换
+                    }
+                }
+            }
+            return $arr;
+        };
+        $fileList = $readAllFile($folderName);
+        if (count($fileList) &lt;= 0) {
+            return Utils::responseFail(['folder_name' =&gt; $folderName], 10001, '未查询到文件，请重新上传');
+        }
+
+        $writeFile = dirname(__FILE__, 3) . '/nginx/static/' . date('Y-m-d') . &quot;/$name.$ext&quot;; // 要写入的文件
+        $wf = fopen($writeFile, 'wb');
+        foreach ($fileList as $fileName) {
+            $fullFilePath = $folderName . $fileName;
+            $handle = fopen($fullFilePath, 'rb');
+            fwrite($wf, fread($handle, filesize($fullFilePath)));
+            fclose($handle);
+            unset($handle);
+        }
+        fclose($wf);
+        unset($wf);
+
+        go(function () use ($folderName) {
+            Utils::delDir($folderName);
+        });
+
+        $url = 'static/' . date('Y-m-d') . &quot;/$name.$ext&quot;; // 外网访问路径
+        if ($ext === 'mp4') {
+            $toFile = substr($writeFile, 0, -4) . '.jpg'; // 要保存的内部路径
+            $firstImgPath = substr($url, 0, -4) . '.jpg'; // 外网访问路径
+            go(function () use ($writeFile, $toFile) {
+                $str = &quot;ffmpeg -i $writeFile -ss 00:00:01 -vframes 1 $toFile&quot;; // 从第 1 秒开始，截取 1 帧
+                var_dump($str);
+                exec($str, $output, $returnVal);
+                if ($returnVal !== 0) {
+                    var_dump('视频第一帧截取失败' . $returnVal . $toFile);
+                } else {
+                    var_dump('视频第一帧截取成功：' . $toFile);
+                }
+            });
+        }
+        return Utils::responseSuccess([
+            'url' =&gt; $url,
+            'full_url' =&gt; QYSConfig::get('url') . '/' . $url,
+            'first_img_path' =&gt; $firstImgPath ?? ''
+        ]);
+    }
+    return Utils::responseSuccess([
+        'url' =&gt; '',
+        'full_url' =&gt; '',
+        'first_img_path' =&gt; ''
+    ]);
+}
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>init 函数 · 技术笔记</title>
+<meta name="description" content="init 函数 - Go">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/59/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/go/index.html">Go</a></p><h1>init 函数</h1><p class="post-meta"><time datetime="2022-12-01">2022-12-01</time> · Go</p><article class="prose">
+<p>每个模块都可以有一个或者多个init函数，它们的特性和作用是：</p>
+<ul>
+<li>init函数的signature是无参数，无返回值</li>
+<li>初始化模块(文件)中全局变量声明无法初始化的复杂类型：map，slice，array等</li>
+<li>模块中仅执行一次的操作，如：数据库初始化，cache初始化，读取配置文件等</li>
+<li>init执行先于main</li>
+<li>只能隐式调用，不支持显式调用</li>
+<li>每个模块(或者包)中可以有多个init函数</li>
+<li>模块中任意文件可以包含多个init函数</li>
+<li>模块内的多个init函数执行顺序Golang语言未定义</li>
+<li>不同模块间init函数按照相互依赖的顺序执行</li>
+</ul>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

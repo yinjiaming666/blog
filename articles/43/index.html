@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>macos corntab 定时任务不执行 · 技术笔记</title>
+<meta name="description" content="macos corntab 定时任务不执行 - 随笔">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/43/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>macos corntab 定时任务不执行</h1><p class="post-meta"><time datetime="2022-08-04">2022-08-04</time> · 随笔</p><article class="prose">
+<blockquote>
+<p>corntab 配置成功后，定时任务不触发，后来发现执行的是一条 docker 命令</p>
+</blockquote>
+<pre><code class="language-python">os.system('docker exec -it heima_server bash -c &quot;cd /app/heima_server/server &amp;&amp; php /app/quick-yet-swoole/QYS/QYS.php -p  
+/app/heima_server/server -c conf/debug.php -f  /app/heima_server/server/task/test.php &quot; ')
+</code></pre>
+<p>docker 必须要用绝对路径并且不能带 -it</p>
+<pre><code class="language-python">os.system('/usr/local/bin/docker exec heima_server bash -c &quot;cd /app/heima_server/server &amp;&amp; php /app/quick-yet-swoole/QYS/QYS.php -p  
+/app/heima_server/server -c conf/debug.php -f  /app/heima_server/server/task/test.php &quot; ')
+</code></pre>
+<p>改成这样好用了</p>
+<p>corntab 一定要用绝对路径包括 python 等</p>
+<p>参考：</p>
+<p>https://blog.csdn.net/mucangmang/article/details/79789931</p>
+<p>https://blog.csdn.net/diandianxiyu_geek/article/details/105714005</p>
+<p>https://blog.csdn.net/seanxwq/article/details/125484860</p>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

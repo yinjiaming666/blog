@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>php 版本管理工具 · 技术笔记</title>
+<meta name="description" content="php 版本管理工具 - PHP">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/109/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/php/index.html">PHP</a></p><h1>php 版本管理工具</h1><p class="post-meta"><time datetime="2024-11-22">2024-11-22</time> · PHP</p><article class="prose">
+<h1>phpbrew</h1>
+<h2>安装</h2>
+<p><a href="https://github.com/phpbrew/phpbrew/wiki/Requirement">安装phpbrew有一些前置要求，官方文档的Requirement在这里</a></p>
+<pre><code class="language-sh">curl -L -O https://github.com/phpbrew/phpbrew/releases/latest/download/phpbrew.phar
+chmod +x phpbrew.phar
+sudo mv phpbrew.phar /usr/local/bin/phpbrew
+phpbrew init 
+</code></pre>
+<p>如果 <code>phpbrew init</code> 报类似
+<code>This application requires the extension "simplexml". You either need to enable it or request the application to be shipped with a polyfill for this extension.</code>
+错误，需要安装 <code>sudo apt-get install -y  php8.1-xml</code> 具体版本需要看当前系统的 php 版本</p>
+<p>先更新下，否则可能使用不了<code>php8.2</code>以上版本</p>
+<pre><code class="language-text">phpbrew self-update 
+</code></pre>
+<p>如果出现下载失败,添加下载超时时间选项</p>
+<pre><code class="language-text">phpbrew install  --connect-timeout 6000 8.3 +default
+</code></pre>
+<p><a href="">https://www.jb51.net/program/313539oei.htm
+</a>
+<a href="">https://stackoverflow.com/questions/64129817/i-am-missing-simplexml-on-my-ubuntu-machine-but-i-cant-download-it</a></p>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

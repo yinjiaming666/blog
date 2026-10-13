@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>最短寻址 · 技术笔记</title>
+<meta name="description" content="最短寻址 - 随笔">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/101/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>最短寻址</h1><p class="post-meta"><time datetime="2024-03-28">2024-03-28</time> · 随笔</p><article class="prose">
+<h1>分享一段 js 实现的两点之间最短寻址</h1>
+<blockquote>
+<p>原博文地址 https://passer-by.com/project.html</p>
+</blockquote>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;title&gt;寻址-最短路径&lt;/title&gt;
+    &lt;link rel=&quot;shortcut icon&quot; href=&quot;/public/img/favicon.png&quot;&gt;
+    &lt;style type=&quot;text/css&quot;&gt;
+        body {
+            font-size: 12px;
+            font-family: &quot;Microsoft Yahei&quot;, Arial, Helvetica;
+        }
+
+        button, input {
+            font-family: &quot;Microsoft Yahei&quot;, Arial, Helvetica;
+        }
+
+        .container {
+            width: 1200px;
+            margin: 0 auto 15px;
+            border: 1px solid #ccc;
+        }
+
+        .container .box {
+            border-bottom: 1px solid #ccc;
+        }
+
+        .container canvas {
+            vertical-align: bottom;
+        }
+
+        .container .panel {
+            position: relative;
+            padding: 10px 20px;
+        }
+
+        .container .panel .right {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .container .panel input {
+            text-align: center;
+        }
+
+        .copy {
+            width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            color: #666;
+        }
+
+        .copy a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .copy a:hover {
+            text-decoration: underline;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;container&quot;&gt;
+    &lt;div class=&quot;box&quot;&gt;
+        &lt;canvas id=&quot;canvas&quot; width=&quot;1200&quot; height=&quot;800&quot;&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;panel&quot;&gt;
+        &lt;div class=&quot;left&quot;&gt;
+            &lt;button id=&quot;start&quot;&gt;起点&lt;/button&gt;
+            &lt;button id=&quot;end&quot;&gt;终点&lt;/button&gt;
+            &lt;button id=&quot;pen&quot;&gt;画笔&lt;/button&gt;
+            &lt;button id=&quot;eraser&quot;&gt;橡皮&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;right&quot;&gt;当前操作:&lt;input id=&quot;type&quot; type=&quot;text&quot; value=&quot;终点&quot; readonly/&gt;
+            &lt;button id=&quot;find&quot;&gt;寻找&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;!--&lt;div class=&quot;copy&quot;&gt;&amp;copy; &lt;a href=&quot;http://www.passer-by.com&quot; target=&quot;_blank&quot;&gt;passer-by.com&lt;/a&gt;&lt;/div&gt;--&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+    (function () {
+        let $canvas = document.getElementById(&quot;canvas&quot;);
+        let $pen = document.getElementById(&quot;pen&quot;);
+        let $eraser = document.getElementById(&quot;eraser&quot;);
+        let $find = document.getElementById(&quot;find&quot;);
+        let $start = document.getElementById(&quot;start&quot;);
+        let $end = document.getElementById(&quot;end&quot;);
+        let $type = document.getElementById(&quot;type&quot;);
+        let context = $canvas.getContext(&quot;2d&quot;);
+        let unit = 10;
+        let width = $canvas.width / unit;
+        let height = $canvas.height / unit;
+        let map = [];
+        let start = [0, 0];
+        let end = [0, 0];
+        let path = &quot;&quot;;
+        let isMouseDown = false;
+        let type = &quot;end&quot;;
+        let type_text = {&quot;end&quot;: &quot;终点&quot;, &quot;start&quot;: &quot;起点&quot;, &quot;pen&quot;: &quot;画笔&quot;, &quot;eraser&quot;: &quot;橡皮&quot;};
+        let scroll = getScroll();
+        for (let x = 0; x &lt; width; x++) {
+            map[x] = new Array(height);
+            for (let y = 0; y &lt; height; y++) {
+                map[x][y] = 0;
+            }
+        }
+        $canvas.onmousedown = function (e) {
+            isMouseDown = true;
+            let x = Math.floor((e.clientX - this.offsetLeft + scroll.left) / unit);
+            let y = Math.floor((e.clientY - this.offsetTop + scroll.top) / unit);
+            if (type == &quot;start&quot;) {
+                start = [x, y];
+                draw();
+            } else if (type == &quot;end&quot;) {
+                end = [x, y];
+                draw();
+            } else if (type == &quot;pen&quot; &amp;&amp; !map[x][y]) {
+                map[x][y] = 1;
+                draw();
+            } else if (type == &quot;eraser&quot; &amp; map[x][y]) {
+                map[x][y] = 0;
+                draw();
+            }
+        };
+        $canvas.onmousemove = function (e) {
+            if (isMouseDown) {
+                let x = Math.floor((e.clientX - this.offsetLeft + scroll.left) / unit);
+                let y = Math.floor((e.clientY - this.offsetTop + scroll.top) / unit);
+                if (type == &quot;start&quot;) {
+                    start = [x, y];
+                    draw();
+                } else if (type == &quot;end&quot;) {
+                    end = [x, y];
+                    draw();
+                } else if (type == &quot;pen&quot; &amp;&amp; !map[x][y]) {
+                    map[x][y] = 1;
+                    draw();
+                } else if (type == &quot;eraser&quot; &amp; map[x][y]) {
+                    map[x][y] = 0;
+                    draw();
+                }
+            }
+        };
+        $canvas.onmouseup = function (e) {
+            isMouseDown = false;
+        };
+        $pen.onclick = function () {
+            type = &quot;pen&quot;;
+            $type.value = type_text[type];
+        };
+        $eraser.onclick = function () {
+            type = &quot;eraser&quot;;
+            $type.value = type_text[type];
+        };
+        $start.onclick = function () {
+            type = &quot;start&quot;;
+            $type.value = type_text[type];
+        };
+        $end.onclick = function () {
+            type = &quot;end&quot;;
+            $type.value = type_text[type];
+        };
+        $find.onclick = function () {
+            console.time('t');
+            path = '|' + finder({'map': map, 'start': start, 'end': end}).join('|') + '|';
+            console.timeEnd('t');
+            draw();
+        }
+        window.onscroll = function () {
+            scroll = getScroll();
+        };
+        draw();
+
+        function draw() {
+            context.fillStyle = &quot;#fff&quot;;
+            context.fillRect(0, 0, $canvas.width, $canvas.width);
+            for (let x = 0; x &lt; width; x++) {
+                for (let y = 0; y &lt; height; y++) {
+                    if (x == start[0] &amp;&amp; y == start[1] || x == end[0] &amp;&amp; y == end[1]) {
+                        context.fillStyle = map[x][y] ? &quot;#ccc&quot; : &quot;#00f&quot;;
+                        context.fillRect(x * unit, y * unit, unit, unit);
+                    } else if (map[x][y]) {
+                        context.fillStyle = &quot;#000&quot;;
+                        context.fillRect(x * unit, y * unit, unit, unit);
+                    } else if (path.indexOf('|' + x + ',' + y + '|') &gt; -1) {
+                        context.fillStyle = &quot;#f00&quot;;
+                        context.fillRect(x * unit, y * unit, unit, unit);
+                    }
+                }
+            }
+        }
+    })();
+
+    function getScroll() {
+        let scrollPos = {};
+        if (window.pageYOffset || window.pageXOffset) {
+            scrollPos['top'] = window.pageYOffset;
+            scrollPos['left'] = window.pageXOffset;
+        } else if (document.compatMode &amp;&amp; document.compatMode != 'BackCompat') {
+            scrollPos['top'] = document.documentElement.scrollTop;
+            scrollPos['left'] = document.documentElement.scrollLeft;
+        } else if (document.body) {
+            scrollPos['top'] = document.body.scrollTop;
+            scrollPos['left'] = document.body.scrollLeft;
+        }
+        return scrollPos;
+    }
+
+    function finder(param) { //获取最短路径
+        let defaults = {
+            map: [],
+            start: [0, 0],
+            end: [0, 0]
+        };
+        // let options = (function (target, params) {
+        //     for (let prop in params) {
+        //         target[prop] = params[prop];
+        //     }
+        //     return target;
+        // })(defaults, param);
+        let options = param;
+
+        let result = [];
+        // if (options.map[options.start[0]][options.start[1]] || options.map[options.end[0]][options.end[1]]) { //当起点或终点设置在墙上
+        //     return [];
+        // }
+
+        console.log(options)
+        let finded = false;
+        let length_x = options.map.length;
+        let steps = new Array(length_x); //步骤的映射
+
+        for (let x = length_x; x--;) {
+            let length_y = options.map[x].length;
+            steps[x] = new Array(length_y);
+            for (let y = length_y; y--;) {
+                steps[x][y] = 0;
+            }
+        }
+
+        let fun = function (list) {
+            let new_list = [];
+            let next = function (from, to) {
+                let x = to[0], y = to[1];
+                if (typeof steps[x] != 'undefined' &amp;&amp; typeof steps[x][y] != 'undefined' &amp;&amp; !options.map[x][y] &amp;&amp; !finded) { //当前点是否可以走
+                    if (x == options.end[0] &amp;&amp; y == options.end[1]) {
+                        steps[x][y] = from;
+                        finded = true;
+                    } else if (!steps[x][y]) {
+                        steps[x][y] = from;
+                        new_list.push(to);
+                    }
+                }
+            };
+
+            for (let i = 0, len = list.length; i &lt; len; i++) {
+                let current = list[i];
+                let x = current[0], y = current[1];
+                // 上下左右四个点
+                next(current, [x + 1, y]);
+                next(current, [x, y + 1]);
+                next(current, [x - 1, y]);
+                next(current, [x, y - 1]);
+            }
+            if (!finded &amp;&amp; new_list.length) {
+                fun(new_list); // 递归调用自己
+            }
+        }
+        fun([options.start])
+
+        console.log(steps)
+        if (finded) {
+            let current = options.end;
+            while (current[0] != options.start[0] || current[1] != options.start[1]) {
+                result.unshift(current);
+                current = steps[current[0]][current[1]];
+            }
+        }
+        return result;
+    }
+&lt;/script&gt;
+&lt;!--&lt;script type=&quot;text/javascript&quot; src=&quot;https://passer-by.com/public/script/stat.js&quot;&gt;&lt;/script&gt;--&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

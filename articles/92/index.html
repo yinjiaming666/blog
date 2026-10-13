@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>docker logs 参数说明 · 技术笔记</title>
+<meta name="description" content="docker logs 参数说明 - 随笔">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/92/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>docker logs 参数说明</h1><p class="post-meta"><time datetime="2024-01-15">2024-01-15</time> · 随笔</p><article class="prose">
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-f</td>
+<td>跟踪日志输出</td>
+<td></td>
+</tr>
+<tr>
+<td>-t</td>
+<td>显示时间戳</td>
+<td></td>
+</tr>
+<tr>
+<td>--since</td>
+<td>显示某个开始时间的日志</td>
+<td>2024-01-14T19:00:00.999999999</td>
+</tr>
+<tr>
+<td>--until</td>
+<td>显示某个结束时间的日志</td>
+<td>2024-01-14T19:00:00.999999999</td>
+</tr>
+<tr>
+<td>--tail</td>
+<td>仅列出最新N条容器日志</td>
+<td>50</td>
+</tr>
+<tr>
+<td>grep ""</td>
+<td>搜索指定内容</td>
+<td>string</td>
+</tr>
+<tr>
+<td>&gt;&gt;</td>
+<td>输出到指定文件</td>
+<td>&gt;&gt; docker.log</td>
+</tr>
+</tbody>
+</table>
+<h3>完整示例</h3>
+<p>docker logs -f 容器名 --since '2024-01-01T19:00:00' --until='2024-01-31T20:00:05' | grep "要搜索的内容" &gt;&gt; 要输出的文件</p>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

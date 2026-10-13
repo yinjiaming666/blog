@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PHP 飞船符用法 · 技术笔记</title>
+<meta name="description" content="PHP 飞船符用法 - PHP">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/112/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/php/index.html">PHP</a></p><h1>PHP 飞船符用法</h1><p class="post-meta"><time datetime="2025-04-07">2025-04-07</time> · PHP</p><article class="prose">
+<h1>PHP 飞船符</h1>
+<h3>飞船符用于比较变量（字符串型、整型、浮点型等），比如说使用场景可以用于 usort 、uasort 、uksort 的回调函数</h3>
+<h3>具体规则</h3>
+<ul>
+<li>当符号两边相等时返回 0</li>
+<li>当符号右边大于符号左边时返回 -1</li>
+<li>当符号左边大于符号右边时返回 1</li>
+</ul>
+<pre><code class="language-php">&lt;?php
+$intA = 1;
+$intB = 2;
+$intC = 1;
+
+echo '整型比较:&lt;br&gt;';
+
+echo $intA &lt;=&gt; $intC; // 返回 0
+echo '&lt;br&gt;';
+
+echo $intA &lt;=&gt; $intB; // 返回 -1
+echo '&lt;br&gt;';
+
+echo $intB &lt;=&gt; $intC; // 返回 1
+
+</code></pre>
+<h3>在 <code>unsort</code> 中使用</h3>
+<pre><code class="language-php">&lt;?php
+// list = [['uid' =&gt; 1, 'score' =&gt; 10], ['uid' =&gt; 2, 'score' =&gt; 5]]
+usort($list, function ($a, $b) {
+    return $b['score'] &lt;=&gt; $a['score']; // 根据 score 字段排序
+});
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

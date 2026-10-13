@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wsl2 docker 拉取镜像出现 Error response from daemon: Get xxx : proxyconnect tcp: dial xxx connect: connection refused 问题 · 技术笔记</title>
+<meta name="description" content="wsl2 docker 拉取镜像出现 Error response from daemon: Get xxx : proxyconnect tcp: dial xxx connect: connection refused 问题 - 随笔">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/115/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>wsl2 docker 拉取镜像出现 Error response from daemon: Get xxx : proxyconnect tcp: dial xxx connect: connection refused 问题</h1><p class="post-meta"><time datetime="2025-06-04">2025-06-04</time> · 随笔</p><article class="prose">
+<blockquote>
+<p>默认情况下，WSL2会在windows的用户目录（一般是C:/Users/&lt;你的用户名&gt;
+/）下创建一个隐藏的.wslconfig文件，这个文件中，有一个设置networkingMode，默认情况下可能是这样的：</p>
+</blockquote>
+<pre><code class="language-env">networkingMode=mirrored
+</code></pre>
+<blockquote>
+<p>此时，如果你想运行docker pull xxx命令，就会出现类似于下面的bug</p>
+</blockquote>
+<pre><code class="language-shell">Error response from daemon: Get &quot;https://registry.cn-hangzhou.aliyuncs.com/v2/&quot;: proxyconnect tcp: dial tcp 127.0.0.1:10080: connect: connection refused
+</code></pre>
+<h2>解决方法</h2>
+<p>删除 <code>networkingMode=mirrored</code> 这行</p>
+<h2>局域网内访问 wsl2 中的服务</h2>
+<pre><code class="language-env">hostAddressLoopback=true
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

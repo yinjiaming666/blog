@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>抖音小游戏接口文档 · 技术笔记</title>
+<meta name="description" content="抖音小游戏接口文档 - 随笔">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/107/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>抖音小游戏接口文档</h1><p class="post-meta"><time datetime="2024-06-06">2024-06-06</time> · 随笔</p><article class="prose">
+<h1>请求地址</h1>
+<p>https://app.hemomaoyi.com/</p>
+<h1>前台</h1>
+<h3>【POST】 登录 /server/login/login</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nickname</td>
+<td>昵称</td>
+</tr>
+<tr>
+<td>avatar</td>
+<td>头像</td>
+</tr>
+<tr>
+<td>code</td>
+<td></td>
+</tr>
+<tr>
+<td>game_index</td>
+<td>游戏索引</td>
+</tr>
+</tbody>
+</table>
+<h3>【POST】 绑定上级 /server/login/bindFather?jwt=</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pid</td>
+<td>上级uid</td>
+</tr>
+</tbody>
+</table>
+<h3>【GET】 获取用户信息 /server/login/loadUser?jwt=</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3>【GET】 看广告 /server/index/lookAd?jwt=</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3>【POST】 申请提现 /server/index/doCash?jwt=</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>coin</td>
+<td>提现金额 0微信，1支付宝，2银行卡</td>
+</tr>
+<tr>
+<td>type</td>
+<td>账号类型</td>
+</tr>
+<tr>
+<td>name</td>
+<td>姓名</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>手机号</td>
+</tr>
+<tr>
+<td>account</td>
+<td>账号</td>
+</tr>
+</tbody>
+</table>
+<h3>【GET】 余额日志 /server/index/getCoinLog?jwt=</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3>【GET】 获取配置 /server/index/getConfig?jwt=</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1>后台</h1>
+<h3>【GET】 用户列表 /server/admin/getUserList?jwt=</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3>【GET】 提现记录 /server/admin/getCashList?jwt=</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3>【POST】 打款 /server/admin/statusCash?jwt=</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>status</td>
+<td>1 打款成功</td>
+</tr>
+</tbody>
+</table>
+<h3>【GET】 余额流水 /server/admin/getCoinLog?jwt=</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

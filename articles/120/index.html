@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>flutter 根据条件显示组件 · 技术笔记</title>
+<meta name="description" content="flutter 根据条件显示组件 - 前端">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/120/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/frontend/index.html">前端</a></p><h1>flutter 根据条件显示组件</h1><p class="post-meta"><time datetime="2025-07-29">2025-07-29</time> · 前端</p><article class="prose">
+<h2>方法一</h2>
+<pre><code class="language-dart">if (isLogin) ...[
+  Text(&quot;已登录&quot;, style: TextStyle(color: Colors.white)),
+] else if(1 == 1) ...[
+  Text(&quot;未登录&quot;, style: TextStyle(color: Colors.white)),
+],
+</code></pre>
+<h2>方法二 （Visibility组件）</h2>
+<pre><code class="language-dart">Visibility(
+  visible: condition, // condition 是一个布尔值，用于控制显示与否
+  child: MyWidget(), // 当condition为true时显示的组件
+  maintainState: true, // 可选参数，如果为true，则即使不可见，也会保留组件的状态，默认为false
+  maintainSize: true, // 可选参数，如果为true，则即使不可见，也会保留组件所占用的空间，默认为false
+)
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

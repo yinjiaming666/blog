@@ -1,0 +1,2 @@
+Markdown==3.9
+markdownify==1.2.3

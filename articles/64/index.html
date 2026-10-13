@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>channel · 技术笔记</title>
+<meta name="description" content="channel - Go">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/64/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/go/index.html">Go</a></p><h1>channel</h1><p class="post-meta"><time datetime="2023-02-26">2023-02-26</time> · Go</p><article class="prose">
+<h3>声明</h3>
+<blockquote>
+<p>make 一个 channel 有两种方式，分别是有缓冲的和没缓冲的<br>
+有缓冲的 channel <code>c := make(chan string, 10)</code> make(chan TYPE,SIZE)<br>
+无缓冲的 channel <code>c := make(chan string)</code> make(chan TYPE)<br></p>
+</blockquote>
+<hr>
+<h3>阻塞</h3>
+<blockquote>
+<p>channel 塞满了，没有取出，就会导致阻塞。会报 fatal error: all goroutines are asleep - deadlock!  <br></p>
+</blockquote>
+<pre><code class="language-go">// 往三个长度的 channel 插入 4 个元素会导致阻塞
+package main
+
+func main() {
+   c := make(chan int, 3)
+   c &lt;- 1
+   c &lt;- 2
+   c &lt;- 3
+   c &lt;- 4
+}
+
+</code></pre>
+<pre><code class="language-go">// 通过协程实时从 channel 取出就不会阻塞了
+package main
+
+func main() {
+   c := make(chan int, 3)
+   go get(c)
+   c &lt;- 1
+   c &lt;- 2
+   c &lt;- 3
+   c &lt;- 4
+}
+
+func get(c chan int) {
+   for {
+      println(&lt;-c)
+   }
+}
+</code></pre>
+<hr>
+<h3>select case 用法</h3>
+<blockquote>
+<p>for select 如果没有 default 的话，channel 的元素取光了会报错 goroutine 1 [select (no cases)] 造成阻塞<br></p>
+</blockquote>
+<pre><code class="language-go">package main
+
+import (
+   &quot;fmt&quot;
+   &quot;time&quot;
+)
+
+func main() {
+   chan1 := make(chan string)
+   chan2 := make(chan string)
+   go pop(chan1, chan2)
+   go setChan1(chan1)
+   go setChan2(chan2)
+   for {
+      time.Sleep(1)
+   }
+}
+
+func pop(c1, c2 chan string) {
+   for {
+      select {
+      case msg1 := &lt;-c1:
+         fmt.Println(msg1)
+      case msg2 := &lt;-c2:
+         fmt.Println(msg2)
+      default:
+         fmt.Println(&quot;no case ok&quot;)
+      }
+   }
+}
+
+func setChan1(c chan string) {
+   c &lt;- &quot;chan1写入 ----- &quot;
+   time.Sleep(1000)
+}
+
+func setChan2(c chan string) {
+   c &lt;- &quot;chan2写入 ----- &quot;
+   time.Sleep(1000)
+}
+
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

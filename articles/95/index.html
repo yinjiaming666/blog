@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mysql 事务隔离级别 · 技术笔记</title>
+<meta name="description" content="mysql 事务隔离级别 - 随笔">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/95/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>mysql 事务隔离级别</h1><p class="post-meta"><time datetime="2024-02-07">2024-02-07</time> · 随笔</p><article class="prose">
+<h1>Mysql 四大事务隔离级别</h1>
+<p>通过 SELECT @@tx_isolation 查询事务隔离级别</p>
+<h3>READ UNCOMMITTED（未提交读）</h3>
+<p>这是最低的隔离级别，它允许事务读取其他事务尚未提交的更改。这种隔离级别可能会导致脏读（Dirty Read）问题，即一个事务读取到另一个事务未提交的更改。</p>
+<h3>READ COMMITTED（提交读）</h3>
+<p>这种隔离级别只允许事务读取已经提交的更改。这种隔离级别可以避免脏读问题，但可能会导致不可重复读（Non-Repeatable
+Read）问题，即一个事务在执行过程中多次读取同一数据，但由于其他事务的提交，这些数据可能会发生变化。（事务A会查询到事务B提交的修改）</p>
+<h3>REPEATABLE READ（可重复读）</h3>
+<p><strong><em>这是MySQL的默认隔离级别</em></strong>。它确保在同一个事务中多次读取同一数据时，结果总是相同的。这种隔离级别可以避免脏读和不可重复读问题，但可能会导致幻读（Phantom
+Read）问题，即一个事务在执行过程中多次查询同一范围的数据，但由于其他事务的提交，这些数据可能会发生变化</p>
+<h3>SERIALIZABLE（可串行化）</h3>
+<p>这是最高的隔离级别，它通过强制事务串行执行来避免脏读、不可重复读和幻读问题。但由于串行执行的限制，这种隔离级别的性能开销也最大。</p>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

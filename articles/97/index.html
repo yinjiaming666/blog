@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ArrayAccess Countable IteratorAggregate JsonSerializable 接口详解 · 技术笔记</title>
+<meta name="description" content="ArrayAccess Countable IteratorAggregate JsonSerializable 接口详解 - PHP">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/97/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/php/index.html">PHP</a></p><h1>ArrayAccess Countable IteratorAggregate JsonSerializable 接口详解</h1><p class="post-meta"><time datetime="2024-03-20">2024-03-20</time> · PHP</p><article class="prose">
+<h2>ArrayAccess Countable IteratorAggregate JsonSerializable 接口详解</h2>
+<p>在 thinkPHP 中，分页（Paginator）实现了 <code>ArrayAccess</code> <code>Countable</code> <code>IteratorAggregate</code> <code>JsonSerializable</code> 四个接口，</p>
+<pre><code class="language-php">abstract class Paginator implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable
+</code></pre>
+<h3>ArrayAccess</h3>
+<p>ArrayAccess 有四个方法存根 <code>offsetExists</code> <code>offsetGet</code> <code>offsetSet</code> <code>offsetUnset</code>提供像访问数组一样访问对象的能力的接口</p>
+<pre><code class="language-php">class Obj implements ArrayAccess
+{
+    public $items = [];
+
+    public function offsetExists($offset): bool
+    {
+        // isset($obj['title'])
+        return array_key_exists($offset, $this-&gt;items);
+    }
+
+    public function offsetGet($offset)
+    {
+        // $obj['title']
+        return $this-&gt;items[$offset];
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        // $obj['title'] = 1
+        if (is_null($offset)) {
+            $this-&gt;items[] = $value;
+        } else {
+            $this-&gt;items[$offset] = $value;
+        }
+    }
+
+    public function offsetUnset($offset)
+    {
+        // unset($obj['title'])
+        unset($this-&gt;items[$offset]);
+    }
+}
+</code></pre>
+<h3>Countable</h3>
+<p>类实现 Countable 可被用于 count() 函数</p>
+<pre><code class="language-php">&lt;?php
+
+class Obj implements Countable
+{
+    public $items = [];
+    public function count(): int
+    {
+        return count($this-&gt;items);
+    }
+}
+
+$obj = new Obj();
+$obj-&gt;items = ['test' =&gt; 1, 'test2' =&gt; 2];
+var_dump(count($obj)); // 输出2
+</code></pre>
+<h3>IteratorAggregate</h3>
+<p>类实现 IteratorAggregate 可被用于 foreach() 函数</p>
+<pre><code class="language-php">&lt;?php
+
+class Obj implements IteratorAggregate
+{
+    public $items = [];
+
+    public function getIterator(): ArrayIterator
+    {
+        return new ArrayIterator($this-&gt;items);
+    }
+}
+
+$obj = new Obj();
+$obj-&gt;items = ['test' =&gt; 1, 'test2' =&gt; 2];
+foreach ($obj as $value) {
+    var_dump($value);
+}
+</code></pre>
+<h3>JsonSerializable</h3>
+<p>实现 JsonSerializable 的类可以 在 json_encode() 时定制他们的 JSON 表示法。</p>
+<pre><code class="language-php">&lt;?php
+
+class Obj implements JsonSerializable
+{
+    public $items = [];
+
+    public function jsonSerialize()
+    {
+        return $this-&gt;items;
+    }
+}
+
+$obj = new Obj();
+$obj-&gt;items = ['test' =&gt; 1, 'test2' =&gt; 2];
+var_dump(json_encode($obj));
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

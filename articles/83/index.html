@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>apisix 关于 nginx 的配置 · 技术笔记</title>
+<meta name="description" content="apisix 关于 nginx 的配置 - 随笔">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/83/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>apisix 关于 nginx 的配置</h1><p class="post-meta"><time datetime="2023-12-21">2023-12-21</time> · 随笔</p><article class="prose">
+<blockquote>
+<p>在 config.yaml 中添加如下配置，<a href="https://apisix.apache.org/zh/docs/apisix/customize-nginx-configuration/">参考地址</a> </p>
+</blockquote>
+<pre><code class="language-yaml">nginx_config: # Config for render the template to generate nginx.conf
+  # user: root                    # Set the execution user of the worker process. This is only
+  # effective if the master process runs with super-user privileges.
+  error_log: /data/html/logs/error.log       # Location of the error log.
+  error_log_level: warn          # Logging level: info, debug, notice, warn, error, crit, alert, or emerg.
+  worker_processes: auto          # Automatically determine the optimal number of worker processes based
+  # on the available system resources.
+  # If you want use multiple cores in container, you can inject the number of
+  # CPU cores as environment variable &quot;APISIX_WORKER_PROCESSES&quot;.
+  enable_cpu_affinity: false      # Disable CPU affinity by default as worker_cpu_affinity affects the
+  # behavior of APISIX in containers. For example, multiple instances could
+  # be bound to one CPU core, which is not desirable.
+  # If APISIX is deployed on a physical machine, CPU affinity can be enabled.
+  worker_rlimit_nofile: 20480     # The number of files a worker process can open.
+  # The value should be larger than worker_connections.
+  worker_shutdown_timeout: 240s   # Timeout for a graceful shutdown of worker processes.
+
+  max_pending_timers: 16384       # The maximum number of pending timers that can be active at any given time.
+  # Error &quot;too many pending timers&quot; indicates the threshold is reached.
+  max_running_timers: 4096        # The maximum number of running timers that can be active at any given time.
+  # Error &quot;lua_max_running_timers are not enough&quot; error indicates the
+  # threshold is reached.
+
+  event:
+    worker_connections: 10620
+
+  # envs:                         # Get environment variables.
+  #  - TEST_ENV
+
+  meta:
+    lua_shared_dict: # Nginx Lua shared memory zone. Size units are m or k.
+      prometheus-metrics: 15m
+
+  stream:
+    enable_access_log: false                 # Enable stream proxy access logging.
+    access_log: /data/html/logs/access_stream.log       # Location of the stream access log.
+    access_log_format: &quot;$remote_addr [$time_local] $protocol $status $bytes_sent $bytes_received $session_time&quot; # Customize log format: http://nginx.org/en/docs/varindex.html
+    access_log_format_escape: default        # Escape default or json characters in variables.
+    lua_shared_dict: # Nginx Lua shared memory zone. Size units are m or k.
+      etcd-cluster-health-check-stream: 10m
+      lrucache-lock-stream: 10m
+      plugin-limit-conn-stream: 10m
+      worker-events-stream: 10m
+      tars-stream: 1m
+
+  # Add other custom Nginx configurations.
+  # Users are responsible for validating the custom configurations
+  # to ensure they are not in conflict with APISIX configurations.
+  main_configuration_snippet: |
+  http_configuration_snippet: |
+  http_server_configuration_snippet: |
+    location /html/ {
+      root /data/html/;
+    }
+  http_server_location_configuration_snippet: |
+  http_admin_configuration_snippet: |
+  http_end_configuration_snippet: |
+  stream_configuration_snippet: |
+  http:
+    enable_access_log: true             # Enable HTTP proxy access logging.
+    access_log: /data/html/logs/access.log         # Location of the access log.
+    access_log_buffer: 16384            # buffer size of access log.
+    access_log_format: &quot;$remote_addr - $remote_user [$time_local] $http_host \&quot;$request\&quot; $status $body_bytes_sent $request_time \&quot;$http_referer\&quot; \&quot;$http_user_agent\&quot; $upstream_addr $upstream_status $upstream_response_time \&quot;$upstream_scheme://$upstream_host$upstream_uri\&quot;&quot;
+    # Customize log format: http://nginx.org/en/docs/varindex.html
+    access_log_format_escape: default   # Escape default or json characters in variables.
+    keepalive_timeout: 60s              # Set the maximum time for which TCP connection keeps alive.
+    client_header_timeout: 60s          # Set the maximum time waiting for client to send the entire HTTP
+    # request header before closing the connection.
+    client_body_timeout: 60s            # Set the maximum time waiting for client to send the request body.
+    client_max_body_size: 0             # Set the maximum allowed size of the client request body.
+    # Default to 0, unlimited.
+    # Unlike Nginx, APISIX does not limit the body size by default.
+    # If exceeded, the 413 (Request Entity Too Large) error is returned.
+    send_timeout: 10s   # Set the maximum time for transmitting a response to the client before closing.
+    underscores_in_headers: &quot;on&quot;  # Allow HTTP request headers to contain underscores in their names.
+    real_ip_header: X-Real-IP     # https://nginx.org/en/docs/http/ngx_http_realip_module.html#real_ip_header
+    real_ip_recursive: &quot;off&quot; # http://nginx.org/en/docs/http/ngx_http_realip_module.html#real_ip_recursive
+    real_ip_from: # http://nginx.org/en/docs/http/ngx_http_realip_module.html#set_real_ip_from
+      - 127.0.0.1
+      - &quot;unix:&quot;
+
+    # custom_lua_shared_dict:     # Custom Nginx Lua shared memory zone for nginx.conf. Size units are m or k.
+    #  ipc_shared_dict: 100m      # Custom shared cache, format: `cache-key: cache-size`
+
+    proxy_ssl_server_name: true   # Send the server name in the SNI extension when establishing an SSL/TLS
+    # connection with the upstream server, allowing the upstream server to
+    # select the appropriate SSL/TLS certificate and configuration based on
+    # the requested server name.
+
+    upstream:
+      keepalive: 320              # Set the maximum time of keep-alive connections to the upstream servers.
+      # When the value is exceeded, the least recently used connection is closed.
+      keepalive_requests: 1000    # Set the maximum number of requests that can be served through one
+      # keep-alive connection.
+      # After the maximum number of requests is made, the connection is closed.
+      keepalive_timeout: 60s      # Set the maximum time for which TCP connection keeps alive.
+    charset: utf-8                # Add the charset to the &quot;Content-Type&quot; response header field.
+    # See http://nginx.org/en/docs/http/ngx_http_charset_module.html#charset
+    variables_hash_max_size: 2048 # Set the maximum size of the variables hash table.
+
+    lua_shared_dict: # Nginx Lua shared memory zone. Size units are m or k.
+      internal-status: 10m
+      plugin-limit-req: 10m
+      plugin-limit-count: 10m
+      prometheus-metrics: 10m
+      plugin-limit-conn: 10m
+      upstream-healthcheck: 10m
+      worker-events: 10m
+      lrucache-lock: 10m
+      balancer-ewma: 10m
+      balancer-ewma-locks: 10m
+      balancer-ewma-last-touched-at: 10m
+      plugin-limit-count-redis-cluster-slot-lock: 1m
+      tracing_buffer: 10m
+      plugin-api-breaker: 10m
+      etcd-cluster-health-check: 10m
+      discovery: 1m
+      jwks: 1m
+      introspection: 10m
+      access-tokens: 1m
+      ext-plugin: 1m
+      tars: 1m
+      cas-auth: 10m
+</code></pre>
+<p>通过 <code>http_server_configuration_snippet</code> 代理静态资源</p>
+<pre><code class="language-yaml">http_server_configuration_snippet: |
+    location /html/ {
+      root /data/html/;
+    }
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

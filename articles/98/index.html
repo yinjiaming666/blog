@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>apisix 改写响应内容（response-rewrite） · 技术笔记</title>
+<meta name="description" content="apisix 改写响应内容（response-rewrite） - 随笔">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/98/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>apisix 改写响应内容（response-rewrite）</h1><p class="post-meta"><time datetime="2024-03-21">2024-03-21</time> · 随笔</p><article class="prose">
+<h1>apisix response-rewrite 插件</h1>
+<blockquote>
+<p>response-rewrite 插件支持修改上游服务或 APISIX 返回的 Body 和 Header 信息。</p>
+</blockquote>
+<p>文档地址 https://apisix.apache.org/zh/docs/apisix/plugins/response-rewrite/</p>
+<table>
+    <thead>
+    <tr>
+        <th>名称</th>
+        <th>类型</th>
+        <th>必选项</th>
+        <th>默认值</th>
+        <th>有效值</th>
+        <th>描述</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>status_code</td>
+        <td>integer</td>
+        <td>否</td>
+        <td></td>
+        <td>[200, 598]</td>
+        <td>修改上游返回状态码，默认保留原始响应代码。</td>
+    </tr>
+    <tr>
+        <td>body</td>
+        <td>string</td>
+        <td>否</td>
+        <td></td>
+        <td></td>
+        <td>修改上游返回的 <code>body</code> 内容，如果设置了新内容，header 里面的 content-length 字段也会被去掉。</td>
+    </tr>
+    <tr>
+        <td>body_base64</td>
+        <td>boolean</td>
+        <td>否</td>
+        <td>false</td>
+        <td></td>
+        <td>当设置时，在写给客户端之前，在<code>body</code>中传递的主体将被解码，这在一些图像和 Protobuffer
+            场景中使用。注意，这个字段只允许对插件配置中传递的主体进行解码，并不对上游响应进行解码。
+        </td>
+    </tr>
+    <tr>
+        <td>headers</td>
+        <td>object</td>
+        <td>否</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>headers.add</td>
+        <td>array</td>
+        <td>否</td>
+        <td></td>
+        <td></td>
+        <td>添加新的响应头。格式为 <code>["name: value", ...]</code>。这个值能够以 <code>$var</code> 的格式包含 NGINX
+            变量，比如 <code>$remote_addr $balancer_ip</code>。
+        </td>
+    </tr>
+    <tr>
+        <td>headers.set</td>
+        <td>object</td>
+        <td>否</td>
+        <td></td>
+        <td></td>
+        <td>改写响应头。格式为 <code>{"name": "value", ...}</code>。这个值能够以 <code>$var</code> 的格式包含 NGINX 变量，比如
+            <code>$remote_addr $balancer_ip</code>。
+        </td>
+    </tr>
+    <tr>
+        <td>headers.remove</td>
+        <td>array</td>
+        <td>否</td>
+        <td></td>
+        <td></td>
+        <td>移除响应头。格式为 <code>["name", ...]</code>。</td>
+    </tr>
+    <tr>
+        <td>vars</td>
+        <td>array[]</td>
+        <td>否</td>
+        <td></td>
+        <td></td>
+        <td><code>vars</code> 是一个表达式列表，只有满足条件的请求和响应才会修改 body 和 header 信息，来自 <a
+                href="https://github.com/api7/lua-resty-expr#operator-list" target="_blank" rel="noopener noreferrer">lua-resty-expr</a>。如果
+            <code>vars</code> 字段为空，那么所有的重写动作都会被无条件的执行。
+        </td>
+    </tr>
+    <tr>
+        <td>filters</td>
+        <td>array[]</td>
+        <td>否</td>
+        <td></td>
+        <td></td>
+        <td>一组过滤器，采用指定字符串表达式修改响应体。</td>
+    </tr>
+    <tr>
+        <td>filters.regex</td>
+        <td>string</td>
+        <td>是</td>
+        <td></td>
+        <td></td>
+        <td>用于匹配响应体正则表达式。</td>
+    </tr>
+    <tr>
+        <td>filters.scope</td>
+        <td>string</td>
+        <td>否</td>
+        <td>"once"</td>
+        <td>"once","global"</td>
+        <td>替换范围，"once" 表达式 <code>filters.regex</code> 仅替换首次匹配上响应体的内容，"global" 则进行全局替换。</td>
+    </tr>
+    <tr>
+        <td>filters.replace</td>
+        <td>string</td>
+        <td>是</td>
+        <td></td>
+        <td></td>
+        <td>替换后的内容。</td>
+    </tr>
+    <tr>
+        <td>filters.options</td>
+        <td>string</td>
+        <td>否</td>
+        <td>"jo"</td>
+        <td></td>
+        <td>正则匹配有效参数，可选项见 <a href="https://github.com/openresty/lua-nginx-module#ngxrematch" target="_blank"
+                                         rel="noopener noreferrer">ngx.re.match</a>。
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>示例</h3>
+<pre><code class="language-json">{
+  &quot;plugins&quot;:{
+    &quot;response-rewrite&quot;: {
+      &quot;disable&quot;: false,
+      &quot;filters&quot;: [
+        {
+          &quot;regex&quot;: &quot;khms0.googleapis.com&quot;,
+          &quot;replace&quot;: &quot;google.yinjiaming.top/khms0&quot;,
+          &quot;scope&quot;: &quot;global&quot;
+        }
+      ]
+    }
+  }
+}
+</code></pre>
+<p>该示例会把响应体中所有的 "khms0.googleapis.com" 替换为 “google.yinjiaing.top/khs0”</p>
+<blockquote>
+<p>如果响应乱码了，可能是因为上游服务的响应体被进行了压缩。可以将请求头带上不接收压缩响应参数（gzip;q=0,deflate,sdch）以解决这个问题</p>
+</blockquote>
+<pre><code class="language-json">{
+  &quot;plugins&quot;:{
+    &quot;proxy-rewrite&quot;: {
+      &quot;headers&quot;: {
+        &quot;accept-encoding&quot;: &quot;gzip;q=0,deflate,sdch&quot;
+      }
+    }
+  }
+}
+</code></pre>
+<h3>完整示例</h3>
+<pre><code class="language-json">{
+  &quot;plugins&quot;:{
+    &quot;response-rewrite&quot;: {
+      &quot;disable&quot;: false,
+      &quot;filters&quot;: [
+        {
+          &quot;regex&quot;: &quot;khms0.googleapis.com&quot;,
+          &quot;replace&quot;: &quot;google.yinjiaming.top/khms0&quot;,
+          &quot;scope&quot;: &quot;global&quot;
+        }
+      ]
+    },
+    &quot;proxy-rewrite&quot;: {
+      &quot;headers&quot;: {
+        &quot;accept-encoding&quot;: &quot;gzip;q=0,deflate,sdch&quot;
+      }
+    }
+  }
+}
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

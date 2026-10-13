@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>for-select 导致 cpu 占用高的问题 · 技术笔记</title>
+<meta name="description" content="for-select 导致 cpu 占用高的问题 - Go">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/82/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/go/index.html">Go</a></p><h1>for-select 导致 cpu 占用高的问题</h1><p class="post-meta"><time datetime="2023-12-04">2023-12-04</time> · Go</p><article class="prose">
+<pre><code class="language-go">package server
+
+import (
+    &quot;fmt&quot;
+    &quot;time&quot;
+)
+
+func InitServer(port string) {
+    for i := 0; i &lt; 10; i++ {
+       go listen()
+    }
+}
+
+func listen() {
+    defer func() {
+       fmt.Println(&quot;协程关闭&quot;)
+    }()
+    for {
+       select {
+       case &lt;-chargePile.Ctx.Done():
+          // 退出信号
+          return
+       default:
+          // 业务代码
+
+          // 如果不加这行，default 会一直空跑抢占 cpu 资源
+          time.Sleep(10)
+       }
+    }
+}
+</code></pre>
+<blockquote>
+<p>如果for循环体一直处于繁忙状态，则cpu被一直抢占，而cpu居高不下，如果循环体有io等待则会出让cpu，不会一直抢占</p>
+<p>select 在有default的情况下，很容易造成类似for死循环 抢占cpu的情况</p>
+</blockquote>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

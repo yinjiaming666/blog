@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>docker 执行 composer 命令 · 技术笔记</title>
+<meta name="description" content="docker 执行 composer 命令 - PHP">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/40/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/php/index.html">PHP</a></p><h1>docker 执行 composer 命令</h1><p class="post-meta"><time datetime="2022-07-27">2022-07-27</time> · PHP</p><article class="prose">
+<pre><code class="language-shell">docker run --rm -v ~/pro/heima:/app -it composer:latest composer install -vvv
+</code></pre>
+<p><code>~/pro/heima</code> 是需要执行命令的目录</p>
+<p><code>-vvv</code> 可输出详细的信息</p>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

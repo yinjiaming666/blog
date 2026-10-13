@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>for 循环使用简写三元运算符（?:）导致内存溢出 · 技术笔记</title>
+<meta name="description" content="for 循环使用简写三元运算符（?:）导致内存溢出 - PHP">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/93/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/php/index.html">PHP</a></p><h1>for 循环使用简写三元运算符（?:）导致内存溢出</h1><p class="post-meta"><time datetime="2024-02-05">2024-02-05</time> · PHP</p><article class="prose">
+<pre><code class="language-php">foreach ($goodsList as $goods) {
+    for ($j = 0; $j &lt; $goods['weight'] ?: 1; $j++) {
+        $t[$goods['seat']][] = $goods;
+    }
+}
+// 该写法会导致内存溢出提示
+// Fatal error: Allowed memory size of 134217728 bytes exhausted (tried to allocate 134217736 bytes)
+
+foreach ($goodsList as $goods) {
+    $goods['weight'] = $goods['weight']  ?: 1;
+    for ($j = 0; $j &lt; $goods['weight']; $j++) {
+        $t[$goods['seat']][] = $goods;
+    }
+}
+// 改为此方式解决
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

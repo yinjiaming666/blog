@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PHP8 注解的使用 · 技术笔记</title>
+<meta name="description" content="PHP8 注解的使用 - PHP">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/71/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/php/index.html">PHP</a></p><h1>PHP8 注解的使用</h1><p class="post-meta"><time datetime="2023-03-24">2023-03-24</time> · PHP</p><article class="prose">
+<h1>php8 注解</h1>
+<p><a href="https://www.laruence.com/2020/06/12/5902.html">参考地址</a></p>
+<h3>声明注解</h3>
+<pre><code class="language-php">&lt;?php
+
+/**
+ * @param $argument
+ * @return void
+ * @author yin
+ */
+#[Route(name: '/api/posts/{id}', methods: ['GET'])]
+#[FunctionName('dummy')]
+function dummy($argument): void
+{
+}
+
+$ref = new ReflectionFunction('dummy');
+var_dump($ref-&gt;getAttributes('Route')[0]-&gt;getArguments()['name']);
+var_dump($ref-&gt;getAttributes('FunctionName')[0]-&gt;getArguments());
+
+</code></pre>
+<h3>输出</h3>
+<pre><code class="language-php">string(15) &quot;/api/posts/{id}&quot;
+array(1) {
+[0]=&gt;
+string(5) &quot;dummy&quot;
+}
+</code></pre>
+<p><code>$refClass-&gt;getAttributes('Route')[0]-&gt;getArguments() 会返回一个数组</code></p>
+<h3>声明注解类</h3>
+<blockquote>
+<p><code>#[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_CLASS)]</code></p>
+</blockquote>
+<pre><code class="language-php">#[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_CLASS)]
+class Route
+{
+    public string $name;
+    public array $methods;
+
+    public function __construct(string $name, array $methods)
+    {
+        $this-&gt;name = $name;
+        $this-&gt;methods = $methods;
+        var_dump($name);
+        var_dump($methods);
+    }
+}
+
+</code></pre>
+<h3>使用注解类</h3>
+<pre><code class="language-php">/**
+ * @param $argument
+ * @return void
+ * @author yin
+ */
+#[Route(name: '/api/posts/{id}', methods: ['GET'])]
+function dummy($argument): void
+{
+}
+
+$refClass = new ReflectionFunction('dummy');
+$route = $refClass-&gt;getAttributes('Route')[0]-&gt;newInstance(); // 会调用 Route 类的构造函数，并返回实例对象
+var_dump($route-&gt;name);
+
+</code></pre>
+<pre><code class="language-php">#[Route(name: '/api/posts/{id}', methods: ['GET'])]
+const T = 'name'; // 会报错
+
+// #[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_CLASS)] 来表明注解类应用的目标类型`
+// 如果使用其他类型调用会报错
+//    TARGET_CLASS    //类的注解类
+//    TARGET_FUNCTION //函数注解类
+//    TARGET_METHOD   //方法注解类
+//    TARGET_PROPERTY //属性注解类
+//    TARGET_CLASS_CONSTANT //类常量注解类
+//    TARGET_PARAMETER //参数注解类
+//    TARGET_ALL 
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

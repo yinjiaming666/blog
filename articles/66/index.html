@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WaitGroup · 技术笔记</title>
+<meta name="description" content="WaitGroup - Go">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/66/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/go/index.html">Go</a></p><h1>WaitGroup</h1><p class="post-meta"><time datetime="2023-03-24">2023-03-24</time> · Go</p><article class="prose">
+<blockquote>
+<p>可以看作是一个计数器，会阻塞主线程。可以使主线程等待说有协程结束。add 几个就要 done 几个</p>
+</blockquote>
+<p><code>w := sync.WaitGroup{} // 声明</code></p>
+<p><code>w.Add(1) // 加一</code></p>
+<p><code>w.Wait() // 阻塞主线程</code></p>
+<p><code>w.Done() // 减一</code></p>
+<pre><code class="language-go">package main
+
+import (
+   &quot;fmt&quot;
+   &quot;sync&quot;
+)
+
+func main() {
+   w := sync.WaitGroup{} // 声明计数器
+   var a []int
+   defer get(&amp;a)
+   for i := 0; i &lt; 200; i++ {
+      w.Add(1) // 计数器加一
+      go worker(&amp;w, i, &amp;a)
+   }
+   w.Wait() // 等待
+   fmt.Println(&quot;结束&quot;)
+}
+
+func worker(w *sync.WaitGroup, i int, arr *[]int) {
+   *arr = append(*arr, i)
+   defer w.Done() // 计数器减一
+}
+
+func get(i *[]int) {
+   fmt.Println(*i)
+}
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>

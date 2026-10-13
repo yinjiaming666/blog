@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>flutter 路由监听 · 技术笔记</title>
+<meta name="description" content="flutter 路由监听 - 前端">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/125/">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/frontend/index.html">前端</a></p><h1>flutter 路由监听</h1><p class="post-meta"><time datetime="2025-10-29">2025-10-29</time> · 前端</p><article class="prose">
+<blockquote>
+<p>在Flutter中主要是用 <code>RouteObserver</code> 对实现了RouteAware接口的Widget进行监测，<code>RouteObserver</code> 需要在 <code>MaterialApp</code>
+进行初始化，而 <code>RouteAware</code> 则需要在子页面中进行监听。</p>
+</blockquote>
+<h2>声明单例 <code>RouteObserver</code></h2>
+<pre><code class="language-dart">class AppRouteObserver {
+  static final RouteObserver&lt;ModalRoute&lt;void&gt;&gt; _routeObserver = RouteObserver&lt;ModalRoute&lt;void&gt;&gt;();
+
+  //这是个单例
+  static final AppRouteObserver _appRouteObserver = AppRouteObserver._internal();
+
+  AppRouteObserver._internal();
+
+  RouteObserver&lt;ModalRoute&lt;void&gt;&gt; get routeObserver {
+    return _routeObserver;
+  }
+
+  factory AppRouteObserver() {
+    return _appRouteObserver;
+  }
+}
+</code></pre>
+<h2>在 <code>MaterialApp</code> 监听 <code>RouteObserver</code></h2>
+<pre><code class="language-dart">
+MaterialApp(
+  home: MyPage(),
+  navigatorObservers: [AppRouteObserver().routeObserver],
+);
+
+</code></pre>
+<h3>在组件中监听 <code>RouteAware</code></h3>
+<pre><code class="language-dart">import 'package:flutter/material.dart';
+
+class MyPage extends StatefulWidget {
+  @override
+  _MyPageState createState() =&gt; _MyPageState();
+}
+
+class _MyPageState extends State&lt;MyPage&gt; with RouteAware {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 注册 RouteAware 监听
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    // 取消注册 RouteAware 监听
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPush() {
+    print(&quot;进入页面&quot;);
+  }
+
+  @override
+  void didPushNext() {
+    print(&quot;从当前页面push到另一个页面&quot;);
+  }
+
+  @override
+  void didPop() {
+    print(&quot;当前的页面被pop&quot;);
+  }
+
+  @override
+  void didPopNext() {
+    print(&quot;从上一页返回&quot;);
+  }
+}
+</code></pre>
+</article>
+</main>
+<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
+</body>
+</html>
