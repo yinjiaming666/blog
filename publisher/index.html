@@ -3,54 +3,60 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>博客发布工具</title>
-  <link rel="stylesheet" href="/app.css">
+  <title>博客文章编辑器</title>
+  <link rel="stylesheet" href="./app.css">
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">博客发布工具 <small>本地运行</small></div>
+    <div class="brand">文章编辑器 <small>离线 · HTML + JavaScript</small></div>
     <div class="top-actions">
-      <a id="open-site" href="https://yinjiaming666.github.io/blog/" target="_blank" rel="noopener noreferrer">查看网站 ↗</a>
-      <button id="new-btn" class="light-button" type="button">新建文章</button>
+      <span id="directory-name" class="directory-name">尚未选择博客目录</span>
+      <button id="resume-folder" class="light-button" type="button" hidden>恢复上次目录</button>
+      <button id="select-folder" class="light-button" type="button">选择博客目录</button>
+      <a id="open-site" href="https://yinjiaming666.github.io/blog/" target="_blank" rel="noopener noreferrer">查看博客 ↗</a>
     </div>
   </header>
   <div class="workspace">
     <aside class="sidebar">
       <div class="sidebar-title">文章 <span id="article-count"></span></div>
-      <input id="search" type="search" placeholder="搜索文章标题" aria-label="搜索文章标题" autocomplete="off">
+      <input id="search" type="search" placeholder="搜索文章" aria-label="搜索文章标题" autocomplete="off" disabled>
       <div id="articles" class="article-list" role="list"></div>
     </aside>
     <main class="editor">
       <div class="field title-field">
         <label for="title">标题</label>
-        <input id="title" type="text" maxlength="250" placeholder="输入文章标题" autocomplete="off">
+        <input id="title" type="text" maxlength="250" placeholder="输入文章标题" autocomplete="off" disabled>
       </div>
       <div class="meta-row">
         <div class="field">
           <label for="category">分类</label>
-          <select id="category"></select>
+          <select id="category" disabled></select>
         </div>
-        <div class="detail"><span id="article-id">未保存的新文章</span><span id="date-info"></span></div>
+        <div class="detail"><span id="article-id">请选择本地博客目录</span><span id="date-info"></span></div>
       </div>
       <div class="writing-header">
         <div class="tabs" role="tablist" aria-label="编辑模式">
           <button class="tab active" id="edit-tab" type="button" role="tab" aria-selected="true">Markdown</button>
           <button class="tab" id="preview-tab" type="button" role="tab" aria-selected="false">预览</button>
         </div>
-        <span class="hint">支持 Markdown、代码块、图片链接</span>
+        <span class="hint">Markdown · 代码块 · 图片链接</span>
       </div>
-      <textarea id="body" aria-label="Markdown 正文" spellcheck="false" placeholder="# 文章内容&#10;&#10;从这里开始写作..."></textarea>
+      <textarea id="body" aria-label="Markdown 正文" spellcheck="false" placeholder="# 文章内容&#10;&#10;从这里开始写作..." disabled></textarea>
       <iframe id="preview" title="文章预览" sandbox="" hidden></iframe>
       <div class="toolbar">
         <div class="toolbar-buttons">
-          <button id="save-btn" class="light-button" type="button">保存本地</button>
-          <button id="publish-btn" class="primary-button" type="button">发布到 GitHub</button>
+          <button id="new-btn" class="light-button" type="button" disabled>新建文章</button>
+          <button id="save-btn" class="light-button" type="button" disabled>保存文章</button>
+          <button id="publish-btn" class="primary-button" type="button" disabled>生成静态网站</button>
         </div>
-        <span id="status" role="status" aria-live="polite"></span>
+        <span id="status" role="status" aria-live="polite">点击“选择博客目录”，选择本地的 utils/blog 文件夹。</span>
       </div>
-      <p class="footnote">“保存本地”只保存 Markdown；“发布到 GitHub”会生成网页、提交并推送到 main。首次发布前请确认 Git SSH 可正常推送。</p>
+      <p class="footnote">保存文章只修改本地 Markdown 和文章信息；生成静态网站会更新 HTML 页面。<strong>不会自动提交或推送 GitHub。</strong> 完成后由你自行执行 git add、commit、push。</p>
     </main>
   </div>
-  <script type="module" src="/app.js"></script>
+  <script src="./marked.umd.js"></script>
+  <script src="./generator.js"></script>
+  <script src="./folder-store.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>

@@ -69,3 +69,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   .toolbar { align-items: start; }
   #body, #preview { height: 55vh; min-height: 300px; }
 }
+.directory-name { color: #68707e; font-size: 12px; max-width: 230px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 600px) {
+  .directory-name { max-width: 165px; }
+  .top-actions { flex-wrap: wrap; gap: 10px; }
+}
