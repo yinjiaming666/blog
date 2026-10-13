@@ -2,8 +2,10 @@
    Intentionally no JS framework, card UI or external fonts. */
 :root { color-scheme: light; }
 html { -webkit-text-size-adjust: 100%; }
+*, *::before, *::after { box-sizing: border-box; }
 body {
-  max-width: 880px;
+  width: 100%;
+  max-width: 1040px;
   padding: 0 18px 36px;
   margin: 24px auto;
   color: #1b1b1b;
@@ -24,9 +26,17 @@ h3 { font-size: 18px; margin: 22px 0 10px; }
 h4 { font-size: 16px; margin: 16px 0 8px; }
 p { margin: 0 0 14px; }
 .post-list { list-style: none; margin: 12px 0 22px; padding: 0; }
-.post-list li { margin-bottom: 9px; line-height: 1.45; }
-.post-list time { display: inline-block; color: #666; min-width: 95px; margin-right: 8px; font-size: 13px; font-variant-numeric: tabular-nums; }
-.post-category { color: #666; white-space: nowrap; margin-left: 5px; font-size: 13px; }
+.post-list li {
+  display: grid;
+  grid-template-columns: 106px minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: start;
+  margin-bottom: 9px;
+  line-height: 1.45;
+}
+.post-list time { color: #666; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.post-entry { min-width: 0; overflow-wrap: anywhere; }
+.post-category { color: #666; white-space: nowrap; margin-left: 6px; font-size: 13px; }
 .post-category a { color: #555; }
 .post-meta { color: #6a6a6a; font-size: 13px; }
 .post-meta { margin: 0 0 26px; }
@@ -60,7 +70,7 @@ p { margin: 0 0 14px; }
   body { margin-top: 12px; padding: 0 14px 24px; font-size: 15px; }
   h1 { font-size: 26px; }
   h2 { font-size: 20px; }
-  .post-list time { min-width: 0; margin-right: 5px; }
-  .post-category { display: inline-block; }
+  .post-list li { grid-template-columns: minmax(0, 1fr); row-gap: 2px; margin-bottom: 12px; }
+  .post-list time { font-size: 12px; }
   .prose pre { padding: 10px; font-size: 12px; }
 }

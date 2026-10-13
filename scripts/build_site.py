@@ -90,8 +90,9 @@ def item(article: dict, prefix: str, categories: dict[int, dict], show_category=
                 if show_category else "")
     return (
         f'<li><time datetime="{esc(date(article))}">{esc(date(article))}</time>'
-        f' <a class="article-title" href="{esc(link)}">{esc(article["title"])}</a>'
-        f'{category}</li>'
+        f'<span class="post-entry">'
+        f'<a class="article-title" href="{esc(link)}">{esc(article["title"])}</a>'
+        f'{category}</span></li>'
     )
 
 
