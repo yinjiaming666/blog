@@ -14,11 +14,8 @@ a { color: #0000bb; text-decoration: underline; text-underline-offset: 2px; }
 a:visited { color: #551a8b; }
 a:hover { color: #ba2500; }
 a:focus-visible { outline: 2px solid #0000bb; outline-offset: 2px; }
-.site-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin: 0 0 10px; }
-.site-top > a { font-weight: bold; font-size: 17px; }
-.site-top > span { font-size: 12px; color: #666; }
 nav { font-size: 14px; line-height: 1.8; }
-nav span { color: #aaa; margin: 0 4px; }
+nav a { display: inline-block; margin-right: 18px; }
 nav a[aria-current="page"] { color: #111; font-weight: bold; text-decoration: none; }
 hr { border: 0; border-top: 1px solid #bcbcbc; margin: 16px 0 24px; }
 h1 { margin: 20px 0 14px; font-size: 30px; font-weight: 700; line-height: 1.3; }
@@ -26,14 +23,12 @@ h2 { font-size: 21px; margin: 24px 0 12px; line-height: 1.35; }
 h3 { font-size: 18px; margin: 22px 0 10px; }
 h4 { font-size: 16px; margin: 16px 0 8px; }
 p { margin: 0 0 14px; }
-.category-links { display: flex; flex-wrap: wrap; gap: 12px 22px; margin: 0 0 18px; }
 .post-list { list-style: none; margin: 12px 0 22px; padding: 0; }
 .post-list li { margin-bottom: 9px; line-height: 1.45; }
 .post-list time { display: inline-block; color: #666; min-width: 95px; margin-right: 8px; font-size: 13px; font-variant-numeric: tabular-nums; }
 .post-category { color: #666; white-space: nowrap; margin-left: 5px; font-size: 13px; }
 .post-category a { color: #555; }
-.subtle, .crumb, .post-meta { color: #6a6a6a; font-size: 13px; }
-.crumb { margin: 10px 0 12px; }
+.post-meta { color: #6a6a6a; font-size: 13px; }
 .post-meta { margin: 0 0 26px; }
 .prose { overflow-wrap: anywhere; }
 .prose > :first-child { margin-top: 0; }
@@ -61,13 +56,10 @@ p { margin: 0 0 14px; }
 .prose th, .prose td { border: 1px solid #bbb; padding: 6px 10px; text-align: left; }
 .prose th { background: #f4f4f4; }
 .prose hr { margin: 24px 0; }
-footer { color: #666; margin-top: 42px; font-size: 12px; }
-footer hr { margin-bottom: 10px; }
 @media (max-width: 600px) {
   body { margin-top: 12px; padding: 0 14px 24px; font-size: 15px; }
   h1 { font-size: 26px; }
   h2 { font-size: 20px; }
-  .site-top { flex-wrap: wrap; }
   .post-list time { min-width: 0; margin-right: 5px; }
   .post-category { display: inline-block; }
   .prose pre { padding: 10px; font-size: 12px; }

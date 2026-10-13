@@ -3,17 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mysql group by 排序 · 技术笔记</title>
+<title>Mysql group by 排序</title>
 <meta name="description" content="Mysql group by 排序 - 随笔">
 <link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/47/">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
-<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
-<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <a href="../../archive/index.html">归档</a> <a href="../../categories/notes/index.html">随笔</a> <a href="../../categories/php/index.html">PHP</a> <a href="../../categories/go/index.html">Go</a> <a href="../../categories/frontend/index.html">前端</a></nav>
 <hr>
 <main>
-<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>Mysql group by 排序</h1><p class="post-meta"><time datetime="2022-11-08">2022-11-08</time> · 随笔</p><article class="prose">
+<h1>Mysql group by 排序</h1><p class="post-meta"><time datetime="2022-11-08">2022-11-08</time> · <a href="../../categories/notes/index.html">随笔</a></p><article class="prose">
 <p>例：工资表（salary） 有 部门Id（department_id），员工Id（uid），工资（price）。需要查出各部门工资最高的员工</p>
 <pre><code class="language-sql">SELECT *
 FROM (SELECT * FROM salary HAVING 1 = 1 ORDER BY price DESC) AS A
@@ -22,6 +21,5 @@ GROUP BY A.department_id
 <p>主要运用到了子查询，性能可能较低。having 1 = 1 好像是取决于 mysql 版本，5.7 不加 having 不好用</p>
 </article>
 </main>
-<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
 </body>
 </html>

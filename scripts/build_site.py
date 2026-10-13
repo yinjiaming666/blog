@@ -52,7 +52,7 @@ def navigation(prefix: str, current: str, categories: list[dict]) -> str:
     for label, link, active in links:
         aria = ' aria-current="page"' if active else ""
         anchors.append(f'<a href="{esc(link)}"{aria}>{esc(label)}</a>')
-    return " <span aria-hidden=\"true\">·</span> ".join(anchors)
+    return " ".join(anchors)
 
 
 def page(*, title: str, description: str, body: str, location: str,
@@ -64,19 +64,17 @@ def page(*, title: str, description: str, body: str, location: str,
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{esc(title)} · 技术笔记</title>
+<title>{esc(title)}</title>
 <meta name="description" content="{esc(description)}">
 <link rel="canonical" href="{esc(canonical)}">
 <link rel="stylesheet" href="{esc(prefix)}style.css">
 </head>
 <body>
-<div class="site-top"><a href="{esc(prefix)}index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
 <nav aria-label="网站导航">{navigation(prefix, current, categories)}</nav>
 <hr>
 <main>
 {body}
 </main>
-<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
 </body>
 </html>
 """
@@ -142,22 +140,9 @@ def build(base_url: str) -> None:
         if target.exists():
             shutil.rmtree(target)
 
-    count = Counter(a["category_id"] for a in articles)
-    latest = articles[:25]
-    directory = " ".join(
-        f'<a href="categories/{CATEGORY_SLUGS[c["id"]]}/index.html">'
-        f'{esc(c["name"])} ({count[c["id"]]})</a>'
-        for c in categories
-    )
-    home = f"""<h1>技术笔记</h1>
-<p>一些关于编程、系统和日常开发的记录。文章按时间排列，内容来自 Markdown。</p>
-<h2>分类</h2>
-<p class="category-links">{directory}</p>
-<h2>最近更新</h2>
-{item_list(latest, "", category_lookup)}
-<p><a href="archive/index.html">查看全部 {len(articles)} 篇文章 »</a></p>
-"""
-    write("index.html", page(title="首页", description="Go、PHP、前端开发与日常技术笔记",
+    # One uncluttered index: the navigation already provides categories and archive.
+    home = item_list(articles, "", category_lookup)
+    write("index.html", page(title="文章", description="Go、PHP 与前端开发文章",
                              body=home, location="index.html", current="home",
                              categories=categories, base_url=base_url))
 
@@ -166,21 +151,20 @@ def build(base_url: str) -> None:
         subset = [a for a in articles if a["category_id"] == category["id"]]
         location = f"categories/{slug}/index.html"
         body = (f'<h1>{esc(category["name"])}</h1>'
-                f'<p class="subtle">{len(subset)} 篇文章 · <a href="../../index.html">返回首页</a></p>'
                 f'{item_list(subset, "../../", category_lookup, show_category=False)}')
-        write(location, page(title=category["name"], description=f'{category["name"]} 分类下的技术笔记',
+        write(location, page(title=category["name"], description=f'{category["name"]} 分类文章',
                              body=body, location=location, current=slug,
                              categories=categories, base_url=base_url))
 
     by_year = defaultdict(list)
     for a in articles:
         by_year[date(a)[:4]].append(a)
-    archive = ['<h1>文章归档</h1>', f'<p class="subtle">共 {len(articles)} 篇文章</p>']
+    archive = ['<h1>文章归档</h1>']
     for year in sorted(by_year, reverse=True):
         archive.append(f'<h2>{esc(year)}</h2>')
         archive.append(item_list(by_year[year], "../", category_lookup))
     write("archive/index.html",
-          page(title="文章归档", description="按年份浏览全部技术笔记",
+          page(title="文章归档", description="按年份浏览全部文章",
                body="\n".join(archive), location="archive/index.html", current="archive",
                categories=categories, base_url=base_url))
 
@@ -195,11 +179,9 @@ def build(base_url: str) -> None:
         cat_link = f'../../categories/{CATEGORY_SLUGS[category["id"]]}/index.html'
         rendered = markdown_html(content, article["title"])
         heading = (
-            f'<p class="crumb"><a href="../../index.html">首页</a> / '
-            f'<a href="{esc(cat_link)}">{esc(category["name"])}</a></p>'
             f'<h1>{esc(article["title"])}</h1>'
             f'<p class="post-meta"><time datetime="{esc(date(article))}">{esc(date(article))}</time>'
-            f' · {esc(category["name"])}</p>'
+            f' · <a href="{esc(cat_link)}">{esc(category["name"])}</a></p>'
         )
         body = heading + f'<article class="prose">\n{rendered}\n</article>'
         location = f'articles/{article["id"]}/index.html'

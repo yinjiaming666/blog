@@ -3,17 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>docker 部署 go · 技术笔记</title>
+<title>docker 部署 go</title>
 <meta name="description" content="docker 部署 go - Go">
 <link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/50/">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
-<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
-<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <a href="../../archive/index.html">归档</a> <a href="../../categories/notes/index.html">随笔</a> <a href="../../categories/php/index.html">PHP</a> <a href="../../categories/go/index.html">Go</a> <a href="../../categories/frontend/index.html">前端</a></nav>
 <hr>
 <main>
-<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/go/index.html">Go</a></p><h1>docker 部署 go</h1><p class="post-meta"><time datetime="2022-12-02">2022-12-02</time> · Go</p><article class="prose">
+<h1>docker 部署 go</h1><p class="post-meta"><time datetime="2022-12-02">2022-12-02</time> · <a href="../../categories/go/index.html">Go</a></p><article class="prose">
 <pre><code class="language-shell">docker run --name container_name -it -p 8086:8080 -v ~/go :/go/src/container_name golang:latest
 </code></pre>
 <p>进入容器 <code>docker exec -it container_name bash</code></p>
@@ -21,6 +20,5 @@
 </code></pre>
 </article>
 </main>
-<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
 </body>
 </html>

@@ -3,17 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Redis 事务 · 技术笔记</title>
+<title>Redis 事务</title>
 <meta name="description" content="Redis 事务 - 随笔">
 <link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/126/">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
-<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
-<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <a href="../../archive/index.html">归档</a> <a href="../../categories/notes/index.html">随笔</a> <a href="../../categories/php/index.html">PHP</a> <a href="../../categories/go/index.html">Go</a> <a href="../../categories/frontend/index.html">前端</a></nav>
 <hr>
 <main>
-<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>Redis 事务</h1><p class="post-meta"><time datetime="2025-12-09">2025-12-09</time> · 随笔</p><article class="prose">
+<h1>Redis 事务</h1><p class="post-meta"><time datetime="2025-12-09">2025-12-09</time> · <a href="../../categories/notes/index.html">随笔</a></p><article class="prose">
 <p><a href="https://www.cnblogs.com/gange111/p/19075653">参考</a></p>
 <h2>基本命令</h2>
 <h3>Redis 事务的本质是将多个命令打包，然后按顺序、一次性、隔离地执行。它通过 MULTI, EXEC, DISCARD, WATCH 四个核心命令实现。</h3>
@@ -42,6 +41,5 @@
 </code></pre>
 </article>
 </main>
-<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
 </body>
 </html>

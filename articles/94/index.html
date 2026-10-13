@@ -3,22 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>记录一次 mysql 并发导致库存超卖的问题 · 技术笔记</title>
+<title>记录一次 mysql 并发导致库存超卖的问题</title>
 <meta name="description" content="记录一次 mysql 并发导致库存超卖的问题 - 随笔">
 <link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/94/">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
-<div class="site-top"><a href="../../index.html">技术笔记</a><span> / Go · PHP · Frontend</span></div>
-<nav aria-label="网站导航"><a href="../../index.html">首页</a> <span aria-hidden="true">·</span> <a href="../../archive/index.html">归档</a> <span aria-hidden="true">·</span> <a href="../../categories/notes/index.html">随笔</a> <span aria-hidden="true">·</span> <a href="../../categories/php/index.html">PHP</a> <span aria-hidden="true">·</span> <a href="../../categories/go/index.html">Go</a> <span aria-hidden="true">·</span> <a href="../../categories/frontend/index.html">前端</a></nav>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <a href="../../archive/index.html">归档</a> <a href="../../categories/notes/index.html">随笔</a> <a href="../../categories/php/index.html">PHP</a> <a href="../../categories/go/index.html">Go</a> <a href="../../categories/frontend/index.html">前端</a></nav>
 <hr>
 <main>
-<p class="crumb"><a href="../../index.html">首页</a> / <a href="../../categories/notes/index.html">随笔</a></p><h1>记录一次 mysql 并发导致库存超卖的问题</h1><p class="post-meta"><time datetime="2024-02-07">2024-02-07</time> · 随笔</p><article class="prose">
+<h1>记录一次 mysql 并发导致库存超卖的问题</h1><p class="post-meta"><time datetime="2024-02-07">2024-02-07</time> · <a href="../../categories/notes/index.html">随笔</a></p><article class="prose">
 <h1>记一次 Mysql 商品超卖</h1>
 <p>问题描述：在并发高的情况下。事务 A 先读取商品库存为 2 并减少库存，此时事务尚未提交。第二次请求就进来了，事务 B 读取的库存还是 2 ，导致了商品超买的问题。</p>
 <p>解决方案：使用乐观锁，update set num = num - 1 where id = id and num = 2</p>
 </article>
 </main>
-<footer><hr><small>技术笔记 · 静态 HTML / Markdown · <a href="https://github.com/yinjiaming666/blog" rel="noopener noreferrer">GitHub</a></small></footer>
 </body>
 </html>
