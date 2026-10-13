@@ -14,12 +14,13 @@
 <main>
 <h1>docker 查看容器资源占用</h1><p class="post-meta"><time datetime="2023-04-14">2023-04-14</time> · <a href="../../categories/notes/index.html">随笔</a></p><article class="prose">
 <p><a href="https://devpress.csdn.net/cloudnative/62f98a9f7e6682346618d5f1.html">参考地址</a></p>
-<pre><code class="language-shell">docker stats --no-stream 
+<pre><code class="language-shell">docker stats --no-stream
 # --no-stream 只会提供第一个结果,而不是不断更新统计信息
 </code></pre>
-<pre><code class="language-shell">docker ps -q | xargs  docker stats --no-stream 
+<pre><code class="language-shell">docker ps -q | xargs  docker stats --no-stream
 # 旧版 docker ，status 必须传入容器 id
 </code></pre>
+
 </article>
 </main>
 </body>

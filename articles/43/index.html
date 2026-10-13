@@ -16,19 +16,20 @@
 <blockquote>
 <p>corntab 配置成功后，定时任务不触发，后来发现执行的是一条 docker 命令</p>
 </blockquote>
-<pre><code class="language-python">os.system('docker exec -it heima_server bash -c &quot;cd /app/heima_server/server &amp;&amp; php /app/quick-yet-swoole/QYS/QYS.php -p  
-/app/heima_server/server -c conf/debug.php -f  /app/heima_server/server/task/test.php &quot; ')
+<pre><code class="language-python">os.system(&#39;docker exec -it heima_server bash -c &quot;cd /app/heima_server/server &amp;&amp; php /app/quick-yet-swoole/QYS/QYS.php -p
+/app/heima_server/server -c conf/debug.php -f  /app/heima_server/server/task/test.php &quot; &#39;)
 </code></pre>
 <p>docker 必须要用绝对路径并且不能带 -it</p>
-<pre><code class="language-python">os.system('/usr/local/bin/docker exec heima_server bash -c &quot;cd /app/heima_server/server &amp;&amp; php /app/quick-yet-swoole/QYS/QYS.php -p  
-/app/heima_server/server -c conf/debug.php -f  /app/heima_server/server/task/test.php &quot; ')
+<pre><code class="language-python">os.system(&#39;/usr/local/bin/docker exec heima_server bash -c &quot;cd /app/heima_server/server &amp;&amp; php /app/quick-yet-swoole/QYS/QYS.php -p
+/app/heima_server/server -c conf/debug.php -f  /app/heima_server/server/task/test.php &quot; &#39;)
 </code></pre>
 <p>改成这样好用了</p>
 <p>corntab 一定要用绝对路径包括 python 等</p>
 <p>参考：</p>
-<p>https://blog.csdn.net/mucangmang/article/details/79789931</p>
-<p>https://blog.csdn.net/diandianxiyu_geek/article/details/105714005</p>
-<p>https://blog.csdn.net/seanxwq/article/details/125484860</p>
+<p><a href="https://blog.csdn.net/mucangmang/article/details/79789931">https://blog.csdn.net/mucangmang/article/details/79789931</a></p>
+<p><a href="https://blog.csdn.net/diandianxiyu_geek/article/details/105714005">https://blog.csdn.net/diandianxiyu_geek/article/details/105714005</a></p>
+<p><a href="https://blog.csdn.net/seanxwq/article/details/125484860">https://blog.csdn.net/seanxwq/article/details/125484860</a></p>
+
 </article>
 </main>
 </body>

@@ -14,7 +14,7 @@
 <main>
 <h1>composer 忽略 PHP 扩展版本</h1><p class="post-meta"><time datetime="2022-07-28">2022-07-28</time> · <a href="../../categories/php/index.html">PHP</a></p><article class="prose">
 <p>composer 安装包的时候会校验 PHP 的版本及扩展，如果我们的环境是搭建在 docker 中，composer 就会提示类似 -
-yansongda/pay[v2.10.0, ..., v2.10.4] require ext-bcmath * -&gt; it is missing from your system. Install or enable PHP's
+yansongda/pay[v2.10.0, ..., v2.10.4] require ext-bcmath * -&gt; it is missing from your system. Install or enable PHP&#39;s
 bcmath extension. 的错误。</p>
 <h3>方法一</h3>
 <p>定义 composer.json</p>
@@ -65,6 +65,7 @@ bcmath extension. 的错误。</p>
 <p>命令行携带参数</p>
 <pre><code class="language-shell">composer install --ignore-platform-reqs
 </code></pre>
+
 </article>
 </main>
 </body>

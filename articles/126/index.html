@@ -21,12 +21,12 @@
 <li>EXEC：执行事务队列中的所有命令。</li>
 <li>DISCARD：取消事务，清空队列。</li>
 <li>WATCH：在 MULTI 之前，监视一个或多个 key。如果在 EXEC 执行前，这些被监视的 key 被其他客户端修改，则整个事务会失败（EXEC 返回
-  nil）。这是实现乐观锁（Optimistic Locking） 的基础。</li>
+nil）。这是实现乐观锁（Optimistic Locking） 的基础。</li>
 </ul>
 <h2>注意</h2>
 <ul>
 <li>不保证原子性（Atomicity）：Redis 事务保证的是隔离性（Isolation） 和顺序执行，但不保证原子性。这意味着如果事务中某个命令执行失败（例如对字符串执行了
-  HINCRBY），其他命令依然会继续执行，且不会回滚（Rollback）</li>
+HINCRBY），其他命令依然会继续执行，且不会回滚（Rollback）</li>
 <li>执行成功 仅表示命令入队并执行，不保证已持久化到磁盘（需配合 AOF 配置 appendfsync always 提升可靠性，但会牺牲性能）。</li>
 </ul>
 <h2>WATCH 实现乐观锁</h2>
@@ -39,6 +39,7 @@
 127.0.0.1:6379(TX)&gt; EXEC
   1) (integer) 2
 </code></pre>
+
 </article>
 </main>
 </body>

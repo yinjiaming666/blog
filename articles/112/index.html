@@ -26,24 +26,24 @@ $intA = 1;
 $intB = 2;
 $intC = 1;
 
-echo '整型比较:&lt;br&gt;';
+echo &#39;整型比较:&lt;br&gt;&#39;;
 
 echo $intA &lt;=&gt; $intC; // 返回 0
-echo '&lt;br&gt;';
+echo &#39;&lt;br&gt;&#39;;
 
 echo $intA &lt;=&gt; $intB; // 返回 -1
-echo '&lt;br&gt;';
+echo &#39;&lt;br&gt;&#39;;
 
 echo $intB &lt;=&gt; $intC; // 返回 1
-
 </code></pre>
 <h3>在 <code>unsort</code> 中使用</h3>
 <pre><code class="language-php">&lt;?php
-// list = [['uid' =&gt; 1, 'score' =&gt; 10], ['uid' =&gt; 2, 'score' =&gt; 5]]
+// list = [[&#39;uid&#39; =&gt; 1, &#39;score&#39; =&gt; 10], [&#39;uid&#39; =&gt; 2, &#39;score&#39; =&gt; 5]]
 usort($list, function ($a, $b) {
-    return $b['score'] &lt;=&gt; $a['score']; // 根据 score 字段排序
+    return $b[&#39;score&#39;] &lt;=&gt; $a[&#39;score&#39;]; // 根据 score 字段排序
 });
 </code></pre>
+
 </article>
 </main>
 </body>

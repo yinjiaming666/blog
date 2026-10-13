@@ -19,6 +19,7 @@ FROM (SELECT * FROM salary HAVING 1 = 1 ORDER BY price DESC) AS A
 GROUP BY A.department_id
 </code></pre>
 <p>主要运用到了子查询，性能可能较低。having 1 = 1 好像是取决于 mysql 版本，5.7 不加 having 不好用</p>
+
 </article>
 </main>
 </body>

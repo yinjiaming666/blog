@@ -16,8 +16,9 @@
 <pre><code class="language-shell">docker run --name container_name -it -p 8086:8080 -v ~/go :/go/src/container_name golang:latest
 </code></pre>
 <p>进入容器 <code>docker exec -it container_name bash</code></p>
-<pre><code class="language-shell">cd src/go_test &amp;&amp; go env -w GO111MODULE=on &amp;&amp; go env -w GOPROXY=https://goproxy.cn,direct &amp;&amp; go mod init 
+<pre><code class="language-shell">cd src/go_test &amp;&amp; go env -w GO111MODULE=on &amp;&amp; go env -w GOPROXY=https://goproxy.cn,direct &amp;&amp; go mod init
 </code></pre>
+
 </article>
 </main>
 </body>

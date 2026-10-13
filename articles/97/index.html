@@ -25,19 +25,19 @@
 
     public function offsetExists($offset): bool
     {
-        // isset($obj['title'])
+        // isset($obj[&#39;title&#39;])
         return array_key_exists($offset, $this-&gt;items);
     }
 
     public function offsetGet($offset)
     {
-        // $obj['title']
+        // $obj[&#39;title&#39;]
         return $this-&gt;items[$offset];
     }
 
     public function offsetSet($offset, $value)
     {
-        // $obj['title'] = 1
+        // $obj[&#39;title&#39;] = 1
         if (is_null($offset)) {
             $this-&gt;items[] = $value;
         } else {
@@ -47,7 +47,7 @@
 
     public function offsetUnset($offset)
     {
-        // unset($obj['title'])
+        // unset($obj[&#39;title&#39;])
         unset($this-&gt;items[$offset]);
     }
 }
@@ -66,7 +66,7 @@ class Obj implements Countable
 }
 
 $obj = new Obj();
-$obj-&gt;items = ['test' =&gt; 1, 'test2' =&gt; 2];
+$obj-&gt;items = [&#39;test&#39; =&gt; 1, &#39;test2&#39; =&gt; 2];
 var_dump(count($obj)); // 输出2
 </code></pre>
 <h3>IteratorAggregate</h3>
@@ -84,7 +84,7 @@ class Obj implements IteratorAggregate
 }
 
 $obj = new Obj();
-$obj-&gt;items = ['test' =&gt; 1, 'test2' =&gt; 2];
+$obj-&gt;items = [&#39;test&#39; =&gt; 1, &#39;test2&#39; =&gt; 2];
 foreach ($obj as $value) {
     var_dump($value);
 }
@@ -104,9 +104,10 @@ class Obj implements JsonSerializable
 }
 
 $obj = new Obj();
-$obj-&gt;items = ['test' =&gt; 1, 'test2' =&gt; 2];
+$obj-&gt;items = [&#39;test&#39; =&gt; 1, &#39;test2&#39; =&gt; 2];
 var_dump(json_encode($obj));
 </code></pre>
+
 </article>
 </main>
 </body>

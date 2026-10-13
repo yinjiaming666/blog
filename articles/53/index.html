@@ -19,8 +19,9 @@
 <pre><code class="language-sql">SELECT *
 FROM s_football_player
 WHERE id &gt;= (SELECT id FROM s_football_player ORDER BY id DESC LIMIT 760000, 1)
-LIMIT 10 -- 0.4s    
+LIMIT 10 -- 0.4s
 </code></pre>
+
 </article>
 </main>
 </body>

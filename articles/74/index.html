@@ -13,27 +13,28 @@
 <hr>
 <main>
 <h1>字符串类型比较</h1><p class="post-meta"><time datetime="2023-06-05">2023-06-05</time> · <a href="../../categories/php/index.html">PHP</a></p><article class="prose">
-<pre><code class="language-php">var_dump(0 == 'test'); // 输出 true
-var_dump(0 === 'test'); // 输出 false
+<pre><code class="language-php">var_dump(0 == &#39;test&#39;); // 输出 true
+var_dump(0 === &#39;test&#39;); // 输出 false
 
 // 原因 int 和 string 做比较时，会把 string 强转为 int 再做比较
-// 0 == 'test' 实际为 0 == (int)'test'
-// (int)'test' = 0
+// 0 == &#39;test&#39; 实际为 0 == (int)&#39;test&#39;
+// (int)&#39;test&#39; = 0
 // php 版本 8.0 以下会出现这个问题
 
 // 其他的一些判断
-var_dump(0 == null); // 输出 true 
+var_dump(0 == null); // 输出 true
 var_dump(0 == false); // 输出 true
-var_dump(0 == 'false'); // 输出 true（8.0 以上为 false）
-var_dump(0 == 't'); // 输出 true（8.0 以上为 false）
-var_dump(0 == '2'); // 输出 false（8.0 以上为 true）
+var_dump(0 == &#39;false&#39;); // 输出 true（8.0 以上为 false）
+var_dump(0 == &#39;t&#39;); // 输出 true（8.0 以上为 false）
+var_dump(0 == &#39;2&#39;); // 输出 false（8.0 以上为 true）
 
 
 如果为两个字符串互相比较会出现
-var_dump('2.mp4' &gt; '10.mp4'); // true
-var_dump('1.mp4' &gt; '10.mp4'); // false
+var_dump(&#39;2.mp4&#39; &gt; &#39;10.mp4&#39;); // true
+var_dump(&#39;1.mp4&#39; &gt; &#39;10.mp4&#39;); // false
 任何版本都会出现这个问题
 </code></pre>
+
 </article>
 </main>
 </body>

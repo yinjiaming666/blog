@@ -69,13 +69,13 @@
 &lt;/div&gt;
 
 &lt;script&gt;
-    const form = document.querySelector('#form')
-    const img = document.querySelector('#img')
-    const ipt = document.querySelector('#iptfile')
+    const form = document.querySelector(&#39;#form&#39;)
+    const img = document.querySelector(&#39;#img&#39;)
+    const ipt = document.querySelector(&#39;#iptfile&#39;)
     const divPreview = document.querySelector(&quot;#preview&quot;)
     let file = null;
     let fileName = (Date.now() + rand(1000, 9999)).toString();
-    let ext = '';
+    let ext = &#39;&#39;;
 
     function rand(min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
@@ -103,8 +103,8 @@
 
     // 预览功能 隐藏input元素
     ipt.style.opacity = 0;
-    ipt.addEventListener('change', (e) =&gt; {
-        ext = '.' + e.target.files[0].name.split('.').pop().toLowerCase();
+    ipt.addEventListener(&#39;change&#39;, (e) =&gt; {
+        ext = &#39;.&#39; + e.target.files[0].name.split(&#39;.&#39;).pop().toLowerCase();
         file = new File([e.target.files[0]], fileName);
         divPreview.innerText = `FileName: ${file.name}, size: ${getSize(file)}`
     })
@@ -115,7 +115,7 @@
         // files.size读取文件大小
         const aMultiples = [&quot;KiB&quot;, &quot;MiB&quot;, &quot;GiB&quot;, &quot;TiB&quot;, &quot;PiB&quot;, &quot;EiB&quot;, &quot;ZiB&quot;, &quot;YiB&quot;];
         let fSize = file.size
-        let outSize = fSize + 'bytes'
+        let outSize = fSize + &#39;bytes&#39;
         let nMult;
         for (fSize /= 1024, nMult = 0; fSize &gt; 1; fSize /= 1024, nMult++) {
             outSize = fSize.toFixed(3) + aMultiples[nMult]
@@ -127,24 +127,24 @@
     function sendFile(file, sort) {
         let xhr = new XMLHttpRequest();
         let fd = new FormData();
-        fd.append('file', file);
-        fd.append('sort', sort);
-        fd.append('num', sliceNum);
-        xhr.open('POST', 'http://app.ycfhtc.com:9080/server/login/uploadSliceFile', true)
+        fd.append(&#39;file&#39;, file);
+        fd.append(&#39;sort&#39;, sort);
+        fd.append(&#39;num&#39;, sliceNum);
+        xhr.open(&#39;POST&#39;, &#39;http://app.ycfhtc.com:9080/server/login/uploadSliceFile&#39;, true)
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 &amp;&amp; xhr.status === 200) {
                 // 上传成功
                 hasUploadNum = hasUploadNum + 1;
-                let divPro = document.querySelector('#progress')
-                divPro.style.width = hasUploadNum / sliceNum * 100 + '%'
-                divPro.innerText = hasUploadNum / sliceNum * 100 + '%'
-                console.log('请求成功, 数据为：', xhr.responseText);
+                let divPro = document.querySelector(&#39;#progress&#39;)
+                divPro.style.width = hasUploadNum / sliceNum * 100 + &#39;%&#39;
+                divPro.innerText = hasUploadNum / sliceNum * 100 + &#39;%&#39;
+                console.log(&#39;请求成功, 数据为：&#39;, xhr.responseText);
                 // if (hasUploadNum === sliceNum) {
                 //     // 调用合并文件接口
                 //     let xhr = new XMLHttpRequest();
-                //     xhr.open('POST', 'http://app.ycfhtc.com:9080/server/login/mergeSliceFile', true);
+                //     xhr.open(&#39;POST&#39;, &#39;http://app.ycfhtc.com:9080/server/login/mergeSliceFile&#39;, true);
                 //     let fd = new FormData();
-                //     fd.append('name', fileName);
+                //     fd.append(&#39;name&#39;, fileName);
                 //     xhr.send(fd);
                 // }
             }
@@ -152,11 +152,11 @@
         xhr.send(fd)
     }
 
-    form.addEventListener('submit', async function (e) {
+    form.addEventListener(&#39;submit&#39;, async function (e) {
         e.preventDefault();
         let arr = sliceFile(file);
         for (let i = 0; i &lt; arr.length; i++) {
-            let f = new File([arr[i]], '2024-01-10/' + fileName + ext);
+            let f = new File([arr[i]], &#39;2024-01-10/&#39; + fileName + ext);
             await sendFile(f, i + 1);
         }
     });
@@ -184,20 +184,20 @@
  */
 public static function uploadSliceFile(Request $request, $response, $redisCli, $mysql): array
 {
-    $sort = $request-&gt;postInt('sort'); // 当前是第几个
-    $num = $request-&gt;postInt('num'); // 一共几个
+    $sort = $request-&gt;postInt(&#39;sort&#39;); // 当前是第几个
+    $num = $request-&gt;postInt(&#39;num&#39;); // 一共几个
 
-    $rootPath = dirname(__FILE__, 3) . '/nginx/static/slice_temp/';
-    $file = $request-&gt;getRequest()-&gt;files['file'];
-    $fileTmpPath = $file['tmp_name'];
+    $rootPath = dirname(__FILE__, 3) . &#39;/nginx/static/slice_temp/&#39;;
+    $file = $request-&gt;getRequest()-&gt;files[&#39;file&#39;];
+    $fileTmpPath = $file[&#39;tmp_name&#39;];
 
-    $file['name'] = explode('/', $file['name']);
-    $file['name'] = end($file['name']); // 1114441555999.mp4
-    var_dump($file['name']);
-    $ext = explode('.', $file['name']);
+    $file[&#39;name&#39;] = explode(&#39;/&#39;, $file[&#39;name&#39;]);
+    $file[&#39;name&#39;] = end($file[&#39;name&#39;]); // 1114441555999.mp4
+    var_dump($file[&#39;name&#39;]);
+    $ext = explode(&#39;.&#39;, $file[&#39;name&#39;]);
     $ext = end($ext); // 文件类型 mp4
 
-    $name = explode('.', $file['name']);
+    $name = explode(&#39;.&#39;, $file[&#39;name&#39;]);
     $name = $name[0]; // 1114441555999
     $folderName = $rootPath . $name . DIRECTORY_SEPARATOR; // /nginx/static/slice_temp/1114441555999/
     if (!file_exists($folderName)) {
@@ -205,12 +205,12 @@ public static function uploadSliceFile(Request $request, $response, $redisCli, $
     }
     $localFileName = $folderName . &quot;$sort.$ext&quot;; // /nginx/static/slice_temp/1114441555999/1.mp4
     if (file_exists($localFileName)) {
-        return Utils::responseFail([], 10001, '重复上传的切片');
+        return Utils::responseFail([], 10001, &#39;重复上传的切片&#39;);
     }
     $res = move_uploaded_file($fileTmpPath, $localFileName);
 
     if (!$res) {
-        return Utils::responseFail([], 10001, '文件上传失败');
+        return Utils::responseFail([], 10001, &#39;文件上传失败&#39;);
     }
 
     Timer::after(3600 * 1000, function () use ($folderName) {
@@ -224,7 +224,7 @@ public static function uploadSliceFile(Request $request, $response, $redisCli, $
             $handler = opendir($folder);
             $arr = [];
             while (($filename = readdir($handler)) !== false) {
-                if ($filename != '.' &amp;&amp; $filename != '..' &amp;&amp; $filename !== '') {
+                if ($filename != &#39;.&#39; &amp;&amp; $filename != &#39;..&#39; &amp;&amp; $filename !== &#39;&#39;) {
                     $arr[] = $filename;
                 }
             }
@@ -243,14 +243,14 @@ public static function uploadSliceFile(Request $request, $response, $redisCli, $
         };
         $fileList = $readAllFile($folderName);
         if (count($fileList) &lt;= 0) {
-            return Utils::responseFail(['folder_name' =&gt; $folderName], 10001, '未查询到文件，请重新上传');
+            return Utils::responseFail([&#39;folder_name&#39; =&gt; $folderName], 10001, &#39;未查询到文件，请重新上传&#39;);
         }
 
-        $writeFile = dirname(__FILE__, 3) . '/nginx/static/' . date('Y-m-d') . &quot;/$name.$ext&quot;; // 要写入的文件
-        $wf = fopen($writeFile, 'wb');
+        $writeFile = dirname(__FILE__, 3) . &#39;/nginx/static/&#39; . date(&#39;Y-m-d&#39;) . &quot;/$name.$ext&quot;; // 要写入的文件
+        $wf = fopen($writeFile, &#39;wb&#39;);
         foreach ($fileList as $fileName) {
             $fullFilePath = $folderName . $fileName;
-            $handle = fopen($fullFilePath, 'rb');
+            $handle = fopen($fullFilePath, &#39;rb&#39;);
             fwrite($wf, fread($handle, filesize($fullFilePath)));
             fclose($handle);
             unset($handle);
@@ -262,34 +262,35 @@ public static function uploadSliceFile(Request $request, $response, $redisCli, $
             Utils::delDir($folderName);
         });
 
-        $url = 'static/' . date('Y-m-d') . &quot;/$name.$ext&quot;; // 外网访问路径
-        if ($ext === 'mp4') {
-            $toFile = substr($writeFile, 0, -4) . '.jpg'; // 要保存的内部路径
-            $firstImgPath = substr($url, 0, -4) . '.jpg'; // 外网访问路径
+        $url = &#39;static/&#39; . date(&#39;Y-m-d&#39;) . &quot;/$name.$ext&quot;; // 外网访问路径
+        if ($ext === &#39;mp4&#39;) {
+            $toFile = substr($writeFile, 0, -4) . &#39;.jpg&#39;; // 要保存的内部路径
+            $firstImgPath = substr($url, 0, -4) . &#39;.jpg&#39;; // 外网访问路径
             go(function () use ($writeFile, $toFile) {
                 $str = &quot;ffmpeg -i $writeFile -ss 00:00:01 -vframes 1 $toFile&quot;; // 从第 1 秒开始，截取 1 帧
                 var_dump($str);
                 exec($str, $output, $returnVal);
                 if ($returnVal !== 0) {
-                    var_dump('视频第一帧截取失败' . $returnVal . $toFile);
+                    var_dump(&#39;视频第一帧截取失败&#39; . $returnVal . $toFile);
                 } else {
-                    var_dump('视频第一帧截取成功：' . $toFile);
+                    var_dump(&#39;视频第一帧截取成功：&#39; . $toFile);
                 }
             });
         }
         return Utils::responseSuccess([
-            'url' =&gt; $url,
-            'full_url' =&gt; QYSConfig::get('url') . '/' . $url,
-            'first_img_path' =&gt; $firstImgPath ?? ''
+            &#39;url&#39; =&gt; $url,
+            &#39;full_url&#39; =&gt; QYSConfig::get(&#39;url&#39;) . &#39;/&#39; . $url,
+            &#39;first_img_path&#39; =&gt; $firstImgPath ?? &#39;&#39;
         ]);
     }
     return Utils::responseSuccess([
-        'url' =&gt; '',
-        'full_url' =&gt; '',
-        'first_img_path' =&gt; ''
+        &#39;url&#39; =&gt; &#39;&#39;,
+        &#39;full_url&#39; =&gt; &#39;&#39;,
+        &#39;first_img_path&#39; =&gt; &#39;&#39;
     ]);
 }
 </code></pre>
+
 </article>
 </main>
 </body>

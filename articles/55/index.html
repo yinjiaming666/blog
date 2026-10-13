@@ -18,10 +18,10 @@ $res = $redisCli-&gt;decrby($key, 1); // 用户购买，如果 res 为负数，�
 </code></pre>
 <p>如果一次可以购买多个商品就需要去用 redis 执行 lua 脚本</p>
 <pre><code class="language-php">$script = &lt;&lt;&lt;crifan
-        local num = redis.call('get', '$key') or 0
+        local num = redis.call(&#39;get&#39;, &#39;$key&#39;) or 0
         num = tonumber(num)
         if num &gt;= $num then
-            redis.call('decrby', '$key', $num)
+            redis.call(&#39;decrby&#39;, &#39;$key&#39;, $num)
             return &quot;success&quot;
         else
             return &quot;fail&quot;
@@ -29,6 +29,7 @@ $res = $redisCli-&gt;decrby($key, 1); // 用户购买，如果 res 为负数，�
 crifan;
 $res = $redisCli-&gt;eval($script);
 </code></pre>
+
 </article>
 </main>
 </body>

@@ -13,9 +13,10 @@
 <hr>
 <main>
 <h1>Mysql count 去重</h1><p class="post-meta"><time datetime="2022-09-30">2022-09-30</time> · <a href="../../categories/notes/index.html">随笔</a></p><article class="prose">
-<pre><code class="language-sql">SELECT city, COUNT(DISTINCT(uid)) FROM s_login_log  WHERE city != ''  GROUP BY city
+<pre><code class="language-sql">SELECT city, COUNT(DISTINCT(uid)) FROM s_login_log  WHERE city != &#39;&#39;  GROUP BY city
 </code></pre>
 <p>通过 <code>COUNT(DISTINCT(uid))</code> 去除重复的字段</p>
+
 </article>
 </main>
 </body>

@@ -19,13 +19,13 @@
 <pre><code class="language-sh">curl -L -O https://github.com/phpbrew/phpbrew/releases/latest/download/phpbrew.phar
 chmod +x phpbrew.phar
 sudo mv phpbrew.phar /usr/local/bin/phpbrew
-phpbrew init 
+phpbrew init
 </code></pre>
 <p>如果 <code>phpbrew init</code> 报类似
-<code>This application requires the extension "simplexml". You either need to enable it or request the application to be shipped with a polyfill for this extension.</code>
+<code>This application requires the extension &quot;simplexml&quot;. You either need to enable it or request the application to be shipped with a polyfill for this extension.</code>
 错误，需要安装 <code>sudo apt-get install -y  php8.1-xml</code> 具体版本需要看当前系统的 php 版本</p>
 <p>先更新下，否则可能使用不了<code>php8.2</code>以上版本</p>
-<pre><code class="language-text">phpbrew self-update 
+<pre><code class="language-text">phpbrew self-update
 </code></pre>
 <p>如果出现下载失败,添加下载超时时间选项</p>
 <pre><code class="language-text">phpbrew install  --connect-timeout 6000 8.3 +default
@@ -33,6 +33,7 @@ phpbrew init
 <p><a href="">https://www.jb51.net/program/313539oei.htm
 </a>
 <a href="">https://stackoverflow.com/questions/64129817/i-am-missing-simplexml-on-my-ubuntu-machine-but-i-cant-download-it</a></p>
+
 </article>
 </main>
 </body>

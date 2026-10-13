@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>博客发布工具</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">博客发布工具 <small>本地运行</small></div>
+    <div class="top-actions">
+      <a id="open-site" href="https://yinjiaming666.github.io/blog/" target="_blank" rel="noopener noreferrer">查看网站 ↗</a>
+      <button id="new-btn" class="light-button" type="button">新建文章</button>
+    </div>
+  </header>
+  <div class="workspace">
+    <aside class="sidebar">
+      <div class="sidebar-title">文章 <span id="article-count"></span></div>
+      <input id="search" type="search" placeholder="搜索文章标题" aria-label="搜索文章标题" autocomplete="off">
+      <div id="articles" class="article-list" role="list"></div>
+    </aside>
+    <main class="editor">
+      <div class="field title-field">
+        <label for="title">标题</label>
+        <input id="title" type="text" maxlength="250" placeholder="输入文章标题" autocomplete="off">
+      </div>
+      <div class="meta-row">
+        <div class="field">
+          <label for="category">分类</label>
+          <select id="category"></select>
+        </div>
+        <div class="detail"><span id="article-id">未保存的新文章</span><span id="date-info"></span></div>
+      </div>
+      <div class="writing-header">
+        <div class="tabs" role="tablist" aria-label="编辑模式">
+          <button class="tab active" id="edit-tab" type="button" role="tab" aria-selected="true">Markdown</button>
+          <button class="tab" id="preview-tab" type="button" role="tab" aria-selected="false">预览</button>
+        </div>
+        <span class="hint">支持 Markdown、代码块、图片链接</span>
+      </div>
+      <textarea id="body" aria-label="Markdown 正文" spellcheck="false" placeholder="# 文章内容&#10;&#10;从这里开始写作..."></textarea>
+      <iframe id="preview" title="文章预览" sandbox="" hidden></iframe>
+      <div class="toolbar">
+        <div class="toolbar-buttons">
+          <button id="save-btn" class="light-button" type="button">保存本地</button>
+          <button id="publish-btn" class="primary-button" type="button">发布到 GitHub</button>
+        </div>
+        <span id="status" role="status" aria-live="polite"></span>
+      </div>
+      <p class="footnote">“保存本地”只保存 Markdown；“发布到 GitHub”会生成网页、提交并推送到 main。首次发布前请确认 Git SSH 可正常推送。</p>
+    </main>
+  </div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

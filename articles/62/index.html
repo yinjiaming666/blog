@@ -21,7 +21,7 @@
 <pre><code class="language-php">    public static function add($red, $name, $data, $delay = 0)
     {
         $bytes = random_bytes(5);
-        $d = ['job_id' =&gt; bin2hex($bytes), 'body' =&gt; $data];
+        $d = [&#39;job_id&#39; =&gt; bin2hex($bytes), &#39;body&#39; =&gt; $data];
         $score = time() + $delay;
         $red-&gt;zadd($name, $score, json_encode($d));
     }
@@ -31,13 +31,14 @@
     {
         $min_score = 0;
         $max_score = time();
-        $res = $red-&gt;zRangeByScore($name, $min_score, $max_score, ['limit' =&gt; [0, 1]]);
+        $res = $red-&gt;zRangeByScore($name, $min_score, $max_score, [&#39;limit&#39; =&gt; [0, 1]]);
         if (count($res) &gt; 0) {
             return json_decode($res[0], true);
         }
         return null;
     }
 </code></pre>
+
 </article>
 </main>
 </body>

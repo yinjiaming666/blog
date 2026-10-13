@@ -19,15 +19,16 @@
 <h3>解决方法</h3>
 <ol>
 <li>设置 mysql.ini</li>
-<li><code>SET @@global.sql_mode ='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';</code> 重启后失效</li>
+<li><code>SET @@global.sql_mode =&#39;STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION&#39;;</code> 重启后失效</li>
 <li>用 <code>any_value()</code> 把非 <code>group by</code> 字段包起来</li>
 </ol>
 <p>如果报错内容为：</p>
-<pre><code>Expression #2 of ORDER BY clause is not in GROUP BY clause and contains nonaggregated column '
-a.createtime' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with
+<pre><code>Expression #2 of ORDER BY clause is not in GROUP BY clause and contains nonaggregated column &#39;
+a.createtime&#39; which is not functionally dependent on columns in GROUP BY clause; this is incompatible with
 sql_mode=only_full_group_by
 </code></pre>
-<p><code>SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));</code></p>
+<p><code>SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,&#39;ONLY_FULL_GROUP_BY&#39;,&#39;&#39;));</code></p>
+
 </article>
 </main>
 </body>

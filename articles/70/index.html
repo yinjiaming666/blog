@@ -21,7 +21,8 @@
 <p>3.client通过获取所有能获取的锁后的时间减去第一步的时间，这个时间差要小于TTL时间并且至少有3个redis实例成功获取锁，才算真正的获取锁成功</p>
 <p>4.如果成功获取锁，则锁的真正有效时间是 TTL减去第三步的时间差 的时间；比如：TTL 是5s,获取所有锁用了2s,则真正锁有效时间为3s(其实应该再减去时钟漂移);</p>
 <p>5.如果客户端由于某些原因获取锁失败，便会开始解锁所有redis实例；因为可能已经获取了小于3个锁，必须释放，否则影响其他client获取锁</p>
-<p>参考：https://blog.csdn.net/z69183787/article/details/107946999</p>
+<p>参考：<a href="https://blog.csdn.net/z69183787/article/details/107946999">https://blog.csdn.net/z69183787/article/details/107946999</a></p>
+
 </article>
 </main>
 </body>

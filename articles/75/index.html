@@ -18,14 +18,15 @@ FROM s_car
 WHERE 1 = 1
   AND invoice_id = &quot;100820000000202306190009&quot;
   AND sku = 765207
-  AND attributes = CAST('[{&quot;name&quot;:&quot;value&quot;,&quot;value&quot;:&quot;value&quot;}]' AS json)
-  AND selection = CAST('[{&quot;name&quot;:&quot;名称&quot;,&quot;values&quot;:[{&quot;name&quot;:&quot;名称&quot;,&quot;additi_charge&quot;:&quot;差价&quot;,&quot;type&quot;:&quot;all&quot;}]}]' AS json)
+  AND attributes = CAST(&#39;[{&quot;name&quot;:&quot;value&quot;,&quot;value&quot;:&quot;value&quot;}]&#39; AS json)
+  AND selection = CAST(&#39;[{&quot;name&quot;:&quot;名称&quot;,&quot;values&quot;:[{&quot;name&quot;:&quot;名称&quot;,&quot;additi_charge&quot;:&quot;差价&quot;,&quot;type&quot;:&quot;all&quot;}]}]&#39; AS json)
   AND bundle_item_list =
-      CAST('[{&quot;product_item_id&quot;:&quot;&quot;,&quot;product_id&quot;:&quot;&quot;,&quot;sku&quot;:&quot;&quot;,&quot;name&quot;:&quot;&quot;,&quot;different_price&quot;:&quot;&quot;,&quot;unit&quot;:&quot;&quot;,&quot;qty&quot;:&quot;&quot;,&quot;department&quot;:&quot;&quot;,&quot;selection&quot;:[]}]' AS json)
+      CAST(&#39;[{&quot;product_item_id&quot;:&quot;&quot;,&quot;product_id&quot;:&quot;&quot;,&quot;sku&quot;:&quot;&quot;,&quot;name&quot;:&quot;&quot;,&quot;different_price&quot;:&quot;&quot;,&quot;unit&quot;:&quot;&quot;,&quot;qty&quot;:&quot;&quot;,&quot;department&quot;:&quot;&quot;,&quot;selection&quot;:[]}]&#39; AS json)
 
--- CAST( '[{&quot;name&quot;:&quot;value&quot;,&quot;value&quot;:&quot;value&quot;}]' AS json ) -- CAST ('字符串' AS json) 可以将字符串格式化为 json，从而进行 json 字段比较
+-- CAST( &#39;[{&quot;name&quot;:&quot;value&quot;,&quot;value&quot;:&quot;value&quot;}]&#39; AS json ) -- CAST (&#39;字符串&#39; AS json) 可以将字符串格式化为 json，从而进行 json 字段比较
 </code></pre>
-<p>参考：https://blog.csdn.net/Nansen_/article/details/125896352</p>
+<p>参考：<a href="https://blog.csdn.net/Nansen_/article/details/125896352">https://blog.csdn.net/Nansen_/article/details/125896352</a></p>
+
 </article>
 </main>
 </body>

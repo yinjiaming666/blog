@@ -29,33 +29,33 @@ func main() {
       fmt.Println(str)
    }
 }
-
 </code></pre>
 <p>x.(type) 这种方式的类型断言，就只能和 switch 搭配使用，因为它需要和多种类型比较判断，以确定其具体类型。</p>
 <pre><code class="language-go">func HandelResponse(r Response, c *gin.Context) {
-    switch r.(type) {
-    case *StringResp:
-        c.Abort()
-        c.String(r.GetHttpCode(), &quot;%s&quot;, r.GetBody())
-        c.Next()
-        break
-    case *JsonResp:
-        c.Abort()
-        c.JSON(r.GetHttpCode(), gin.H{
-            &quot;code&quot;: r.GetCode(),
-            &quot;msg&quot;:  r.GetMsg(),
-            &quot;data&quot;: r.GetBody(),
-        })
-        c.Next()
-        break
-    case *XmlResp:
-        c.Abort()
-        c.XML(r.GetHttpCode(), r.GetBody())
-        c.Next()
-        break
-    }
+	switch r.(type) {
+	case *StringResp:
+		c.Abort()
+		c.String(r.GetHttpCode(), &quot;%s&quot;, r.GetBody())
+		c.Next()
+		break
+	case *JsonResp:
+		c.Abort()
+		c.JSON(r.GetHttpCode(), gin.H{
+			&quot;code&quot;: r.GetCode(),
+			&quot;msg&quot;:  r.GetMsg(),
+			&quot;data&quot;: r.GetBody(),
+		})
+		c.Next()
+		break
+	case *XmlResp:
+		c.Abort()
+		c.XML(r.GetHttpCode(), r.GetBody())
+		c.Next()
+		break
+	}
 }
 </code></pre>
+
 </article>
 </main>
 </body>

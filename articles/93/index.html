@@ -14,21 +14,22 @@
 <main>
 <h1>for 循环使用简写三元运算符（?:）导致内存溢出</h1><p class="post-meta"><time datetime="2024-02-05">2024-02-05</time> · <a href="../../categories/php/index.html">PHP</a></p><article class="prose">
 <pre><code class="language-php">foreach ($goodsList as $goods) {
-    for ($j = 0; $j &lt; $goods['weight'] ?: 1; $j++) {
-        $t[$goods['seat']][] = $goods;
+    for ($j = 0; $j &lt; $goods[&#39;weight&#39;] ?: 1; $j++) {
+        $t[$goods[&#39;seat&#39;]][] = $goods;
     }
 }
 // 该写法会导致内存溢出提示
 // Fatal error: Allowed memory size of 134217728 bytes exhausted (tried to allocate 134217736 bytes)
 
 foreach ($goodsList as $goods) {
-    $goods['weight'] = $goods['weight']  ?: 1;
-    for ($j = 0; $j &lt; $goods['weight']; $j++) {
-        $t[$goods['seat']][] = $goods;
+    $goods[&#39;weight&#39;] = $goods[&#39;weight&#39;]  ?: 1;
+    for ($j = 0; $j &lt; $goods[&#39;weight&#39;]; $j++) {
+        $t[$goods[&#39;seat&#39;]][] = $goods;
     }
 }
 // 改为此方式解决
 </code></pre>
+
 </article>
 </main>
 </body>

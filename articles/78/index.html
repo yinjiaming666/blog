@@ -57,7 +57,7 @@ echo &quot;程序执行时间：&quot; . $executionTime . &quot;毫秒&quot;;
 // int(2)
 // int(3)
 // int(4)
-// 程序执行时间：1.6350746154785毫秒% 
+// 程序执行时间：1.6350746154785毫秒%
 </code></pre>
 <p>多协程的写法性能会有显著提升
 注意：如果将 <code>co::sleep(1);</code> 替换为 <code>sleep(1);</code> 时间又和普通版差不多了</p>
@@ -71,20 +71,20 @@ echo &quot;程序执行时间：&quot; . $executionTime . &quot;毫秒&quot;;
 <pre><code class="language-php">$startTime = microtime(true);
 run(function () {
     go(function () {
-        $mysql = Mysql::getInstance('mysql1');
+        $mysql = Mysql::getInstance(&#39;mysql1&#39;);
         $userLogModel = new UserLogModel($mysql);
         $userLogModel-&gt;select();
-        var_dump('查询');
+        var_dump(&#39;查询&#39;);
     });
 
     go(function () {
-        $mysql = Mysql::getInstance('mysql1');
+        $mysql = Mysql::getInstance(&#39;mysql1&#39;);
         $userLogModel = new UserLogModel($mysql);
         $userLogModel-&gt;select();
-        var_dump('查询');
+        var_dump(&#39;查询&#39;);
     });
 
-    var_dump('结束');
+    var_dump(&#39;结束&#39;);
 });
 $endTime = microtime(true);
 $executionTime = ($endTime - $startTime) * 1000;
@@ -92,10 +92,11 @@ echo &quot;程序执行时间：&quot; . $executionTime . &quot;毫秒&quot;;
 // string(6) &quot;结束&quot;
 // string(6) &quot;查询&quot;
 // string(6) &quot;查询&quot;
-// 程序执行时间：682.88898468018毫秒%   
+// 程序执行时间：682.88898468018毫秒%
 </code></pre>
 <p>示例3 <code>go(function () {})</code> 必须放在协程容器 <code>run(function () {})</code> 中，否则无效（查询，查询，结束）</p>
-<p>参考：https://blog.csdn.net/weixin_41282397/article/details/84646816</p>
+<p>参考：<a href="https://blog.csdn.net/weixin_41282397/article/details/84646816">https://blog.csdn.net/weixin_41282397/article/details/84646816</a></p>
+
 </article>
 </main>
 </body>

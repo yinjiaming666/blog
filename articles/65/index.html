@@ -14,18 +14,19 @@
 <main>
 <h1>Mysql 每 15 秒分组</h1><p class="post-meta"><time datetime="2023-02-23">2023-02-23</time> · <a href="../../categories/notes/index.html">随笔</a></p><article class="prose">
 <pre><code class="language-sql">SELECT
-    CONCAT(DATE_FORMAT( tick, '%Y-%m-%d %H:%i:' ), LPAD( FLOOR( SECOND ( tick )/ 15 )* 15, 2, '0' )) AS time,
-    MAX( price ) AS high,
-    MIN( price ) AS low,
-    GROUP_CONCAT( price ),
-    COUNT( 1 ) AS num 
+	CONCAT(DATE_FORMAT( tick, &#39;%Y-%m-%d %H:%i:&#39; ), LPAD( FLOOR( SECOND ( tick )/ 15 )* 15, 2, &#39;0&#39; )) AS time,
+	MAX( price ) AS high,
+	MIN( price ) AS low,
+	GROUP_CONCAT( price ),
+	COUNT( 1 ) AS num
 FROM
-    s_real_time_cycle 
+	s_real_time_cycle
 GROUP BY
-    time;
+	time;
 </code></pre>
 <p>tick 为 timestamp 类型</p>
 <p><code>GROUP_CONCAT 函数跟 group by 一起用，把该字段的值打印在一行逗号分隔</code></p>
+
 </article>
 </main>
 </body>

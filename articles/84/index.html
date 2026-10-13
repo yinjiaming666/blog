@@ -14,8 +14,9 @@
 <main>
 <h1>ThinkPHP 关联模型（belongsTo）如何获取软删除数据</h1><p class="post-meta"><time datetime="2023-12-22">2023-12-22</time> · <a href="../../categories/php/index.html">PHP</a></p><article class="prose">
 <p><a href="https://www.thinkphp.cn/topic/59424.html">参考链接</a></p>
-<pre><code class="language-php">return $this-&gt;belongsTo('app\api\model\wanlshop\Shop', 'shop_id', 'id', [], 'LEFT')-&gt;removeOption('soft_delete')-&gt;setEagerlyType(0);
+<pre><code class="language-php">return $this-&gt;belongsTo(&#39;app\api\model\wanlshop\Shop&#39;, &#39;shop_id&#39;, &#39;id&#39;, [], &#39;LEFT&#39;)-&gt;removeOption(&#39;soft_delete&#39;)-&gt;setEagerlyType(0);
 </code></pre>
+
 </article>
 </main>
 </body>

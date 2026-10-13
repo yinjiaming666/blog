@@ -41,10 +41,9 @@ MaterialApp(
   home: MyPage(),
   navigatorObservers: [AppRouteObserver().routeObserver],
 );
-
 </code></pre>
 <h3>在组件中监听 <code>RouteAware</code></h3>
-<pre><code class="language-dart">import 'package:flutter/material.dart';
+<pre><code class="language-dart">import &#39;package:flutter/material.dart&#39;;
 
 class MyPage extends StatefulWidget {
   @override
@@ -87,6 +86,7 @@ class _MyPageState extends State&lt;MyPage&gt; with RouteAware {
   }
 }
 </code></pre>
+
 </article>
 </main>
 </body>

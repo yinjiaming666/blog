@@ -14,7 +14,7 @@
 <main>
 <h1>MySql 多列查询</h1><p class="post-meta"><time datetime="2023-02-01">2023-02-01</time> · <a href="../../categories/notes/index.html">随笔</a></p><article class="prose">
 <p>今天遇到了一个需求</p>
-<p><img alt="" src="https://file.yinjiaming.top/api/index/static/blog/1675238057.jpeg"></p>
+<p><img src="https://file.yinjiaming.top/api/index/static/blog/1675238057.jpeg" alt=""></p>
 <p>要查询出同时满足这两个条件的用户 （config_type = eud &amp;&amp; value = 1）（config_type = income &amp;&amp; value = 2）</p>
 <p>查了很久终于想出了一个笨办法</p>
 <p>SELECT</p>
@@ -22,14 +22,15 @@
 <p>FROM</p>
 <p>s_user_extend</p>
 <p>WHERE</p>
-<p>( extend_type, config_type, <code>value</code> ) = ( 0, "edu", 1 )</p>
+<p>( extend_type, config_type, <code>value</code> ) = ( 0, &quot;edu&quot;, 1 )</p>
 <p>OR</p>
-<p>( extend_type, config_type, <code>value</code> ) = ( 0, "income", 2 )</p>
+<p>( extend_type, config_type, <code>value</code> ) = ( 0, &quot;income&quot;, 2 )</p>
 <p>GROUP BY</p>
 <p>uid</p>
 <p>HAVING</p>
 <p>COUNT( uid ) = 2</p>
 <p>通过 count 条数来判断哪个用户都满足了这两个条件</p>
+
 </article>
 </main>
 </body>

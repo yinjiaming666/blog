@@ -19,7 +19,7 @@
 <p>当两个及以上的事务，双方都在等待对方释放已经持有的锁或因为加锁顺序不一致造成循环等待锁资源，就会出现“死锁”</p>
 </blockquote>
 <h3>线上服务器出现死锁报错</h3>
-<pre><code>ERROR   php_swoole_server_rshutdown (ERRNO 503): Fatal error: Uncaught Swoole\Database\MysqliException: Deadlock found when trying to get lock; try restarting transaction in @swoole-src/library/core/Database/MysqliProxy.php:61
+<pre><code>ERROR	php_swoole_server_rshutdown (ERRNO 503): Fatal error: Uncaught Swoole\Database\MysqliException: Deadlock found when trying to get lock; try restarting transaction in @swoole-src/library/core/Database/MysqliProxy.php:61
 </code></pre>
 <h3>通过 <code>SHOW ENGINE INNODB STATUS;</code> 查看死锁日志如下</h3>
 <pre><code>=====================================
@@ -89,7 +89,7 @@ Record lock, heap no 84 PHYSICAL RECORD: n_fields 18; compact format; info bits 
 TRANSACTIONS
 ------------
 Trx id counter 3097944
-Purge done for trx's n:o &lt; 3097944 undo n:o &lt; 0 state: running but idle
+Purge done for trx&#39;s n:o &lt; 3097944 undo n:o &lt; 0 state: running but idle
 History list length 22
 LIST OF TRANSACTIONS FOR EACH SESSION:
 ---TRANSACTION 421888614926856, not started
@@ -228,7 +228,7 @@ I/O thread 7 state: waiting for completed aio requests (write thread)
 I/O thread 8 state: waiting for completed aio requests (write thread)
 I/O thread 9 state: waiting for completed aio requests (write thread)
 Pending normal aio reads: [0, 0, 0, 0] , aio writes: [0, 0, 0, 0] ,
- ibuf aio reads:, log i/o's:, sync i/o's:
+ ibuf aio reads:, log i/o&#39;s:, sync i/o&#39;s:
 Pending flushes (fsync) log: 0; buffer pool: 0
 11013534432 OS file reads, 4943832 OS file writes, 3396540 OS fsyncs
 0.00 reads/s, 0 avg bytes/read, 0.00 writes/s, 0.00 fsyncs/s
@@ -257,7 +257,7 @@ Log flushed up to   1869576871
 Pages flushed up to 1869576871
 Last checkpoint at  1869576862
 0 pending log flushes, 0 pending chkp writes
-1594823 log i/o's done, 0.00 log i/o's/second
+1594823 log i/o&#39;s done, 0.00 log i/o&#39;s/second
 ----------------------
 BUFFER POOL AND MEMORY
 ----------------------
@@ -299,6 +299,7 @@ END OF INNODB MONITOR OUTPUT
 <p><strong><em>先在事务中执行的第一条sql，第二条sql是在队列中执行的，第一条sql事务尚未体交，第二条sql就已经执行了。</em></strong></p>
 <h3>解决方法</h3>
 <p>第二条sql包含了第一条，程序判断如果执行第二条sql的情况下，就不执行第一条sql。</p>
+
 </article>
 </main>
 </body>

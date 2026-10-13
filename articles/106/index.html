@@ -13,10 +13,11 @@
 <hr>
 <main>
 <h1>mysql 最大连接数设置</h1><p class="post-meta"><time datetime="2024-06-05">2024-06-05</time> · <a href="../../categories/notes/index.html">随笔</a></p><article class="prose">
-<pre><code class="language-mysql">SHOW VARIABLES LIKE '%max_connections%'; -- 查看当前设置的连接数
-SHOW GLOBAL STATUS LIKE '%Max_used_connections%'; -- 历史最大连接数
+<pre><code class="language-mysql">SHOW VARIABLES LIKE &#39;%max_connections%&#39;; -- 查看当前设置的连接数
+SHOW GLOBAL STATUS LIKE &#39;%Max_used_connections%&#39;; -- 历史最大连接数
 SET GLOBAL max_connections = 500; -- 设置连接数
 </code></pre>
+
 </article>
 </main>
 </body>

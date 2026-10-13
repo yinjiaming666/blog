@@ -46,8 +46,11 @@ func listen() {
 </code></pre>
 <blockquote>
 <p>如果for循环体一直处于繁忙状态，则cpu被一直抢占，而cpu居高不下，如果循环体有io等待则会出让cpu，不会一直抢占</p>
+</blockquote>
+<blockquote>
 <p>select 在有default的情况下，很容易造成类似for死循环 抢占cpu的情况</p>
 </blockquote>
+
 </article>
 </main>
 </body>
