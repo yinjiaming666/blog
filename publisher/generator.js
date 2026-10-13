@@ -5,6 +5,10 @@
 
   const CATEGORY_SLUGS = { 1: 'notes', 2: 'php', 3: 'go', 4: 'frontend' };
   const BASE_URL = 'https://yinjiaming666.github.io/blog/';
+  const SITE_NAME = 'yinjiaming的博客';
+  const AUTHOR = 'yinjiaming';
+  const SITE_DESCRIPTION = 'yinjiaming的博客，记录 Go、PHP、Flutter、Vue 和前端开发中的技术实践、问题排查与解决方法。';
+  const SHARE_IMAGE = BASE_URL + 'social-card.png';
   const esc = (value) => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   const prefixFor = (location) => '../'.repeat(location.split('/').length - 1);
@@ -108,6 +112,9 @@
           original_format: 'markdown' };
 
     const existingBody = previous ? await readText(directory, record.source) : null;
+    if (previous && (previous.title !== title || previous.category_id !== categoryId || existingBody !== body)) {
+      record.updated_at = localISO(now);
+    }
     const metadataBefore = JSON.stringify(data, null, 2) + '\n';
     if (previous) Object.assign(previous, record);
     else data.articles.push(record);
@@ -156,17 +163,129 @@
     ).join(' ');
   }
 
-  function page({ title, description, body, location, current, categories, baseURL }) {
+  // Summaries use real Markdown prose rather than repeating only the title or category.
+  // marked.lexer ignores fenced code blocks and produces paragraph tokens.
+  function plainText(value) {
+    return String(value)
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&(?:amp|lt|gt|quot|apos|nbsp);/gi, entity => ({
+        '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&apos;': "'", '&nbsp;': ' '
+      })[entity.toLowerCase()] || entity)
+      .replace(/&#(x[0-9a-f]+|\d+);/gi, (entity, code) => {
+        const num = code[0].toLowerCase() === 'x' ? parseInt(code.slice(1), 16) : Number(code);
+        return Number.isInteger(num) && num > 0 && num <= 0x10ffff ? String.fromCodePoint(num) : ' ';
+      })
+      .replace(/[`*~]+/g, '')
+      .replace(/\bhttps?:\/\/[^\s]+/gi, ' ')
+      .replace(/\s+/g, ' ').trim();
+  }
+
+  function truncate(value, max = 155) {
+    const chars = Array.from(plainText(value));
+    return chars.length <= max ? chars.join('') : chars.slice(0, max - 1).join('').trimEnd() + '…';
+  }
+
+  function articleDescription(markdownText, title, categoryName) {
+    const tokens = globalThis.marked.lexer(markdownText, { gfm: true });
+    const fragments = [];
+    function collect(list) {
+      for (const token of list) {
+        if (fragments.join(' ').length > 270) break;
+        if (token.type === 'paragraph' || token.type === 'text' || token.type === 'heading') {
+          const value = plainText(token.text);
+          // Skip heading-only labels and attribution links; favor meaningful source text.
+          if (value && value !== title && Array.from(value).length >= 12 &&
+              !/^(参考|原文|原博文地址|来源|更多信息)\s*[:：]?$/i.test(value)) fragments.push(value);
+        } else if (token.type === 'blockquote') {
+          collect(token.tokens || []);
+        }
+      }
+    }
+    collect(tokens);
+    if (fragments.length) return truncate(fragments.join(' '));
+    // If an article contains only code or tables, do not invent a summary.
+    return truncate(title + '。' + SITE_NAME + '中关于' + categoryName + '的技术文章。');
+  }
+
+  function jsonLD(data) {
+    // Prevent article titles from ending the JSON-LD script or injecting markup.
+    return JSON.stringify(data).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')
+      .replace(/&/g, '\\u0026').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+  }
+
+  function breadcrumbs(items) {
+    return {
+      '@type': 'BreadcrumbList',
+      itemListElement: items.map(([name, url], i) => ({
+        '@type': 'ListItem', position: i + 1, name, item: url
+      }))
+    };
+  }
+
+  function page({ title, description, body, location, current, categories, baseURL,
+                  type = 'website', article = null, category = null, ld = [] }) {
     const prefix = prefixFor(location);
     const canonical = fullURL(baseURL, location === 'index.html' ? '' : location.replace(/index\.html$/, ''));
+    const fullTitle = location === 'index.html' ? SITE_NAME : title + ' | ' + SITE_NAME;
+    const summary = truncate(description);
+    const entities = ld.map(entity => ({ ...entity, '@context': 'https://schema.org' }));
+    if (article) {
+      entities.push({
+        '@context': 'https://schema.org', '@type': 'BlogPosting',
+        headline: article.title, description: summary, url: canonical,
+        mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+        datePublished: article.created_at,
+        ...(article.updated_at ? { dateModified: article.updated_at } : {}),
+        author: { '@type': 'Person', name: AUTHOR },
+        publisher: { '@type': 'Person', name: AUTHOR },
+        image: SHARE_IMAGE, articleSection: category.name,
+        inLanguage: 'zh-CN', isPartOf: { '@id': fullURL(baseURL, '#blog') }
+      });
+      entities.push({ '@context': 'https://schema.org',
+        ...breadcrumbs([
+          [SITE_NAME, baseURL], [category.name, fullURL(baseURL, 'categories/' + CATEGORY_SLUGS[category.id] + '/')],
+          [article.title, canonical]
+        ])
+      });
+    }
+    const seo = [
+      '<title>' + esc(fullTitle) + '</title>',
+      '<meta name="description" content="' + esc(summary) + '">',
+      '<meta name="author" content="' + esc(AUTHOR) + '">',
+      '<link rel="canonical" href="' + esc(canonical) + '">',
+      '<meta property="og:type" content="' + type + '">',
+      '<meta property="og:site_name" content="' + esc(SITE_NAME) + '">',
+      '<meta property="og:locale" content="zh_CN">',
+      '<meta property="og:title" content="' + esc(fullTitle) + '">',
+      '<meta property="og:description" content="' + esc(summary) + '">',
+      '<meta property="og:url" content="' + esc(canonical) + '">',
+      '<meta property="og:image" content="' + esc(SHARE_IMAGE) + '">',
+      '<meta property="og:image:type" content="image/png">',
+      '<meta property="og:image:width" content="1200">',
+      '<meta property="og:image:height" content="630">',
+      '<meta property="og:image:alt" content="' + esc(SITE_NAME) + '">',
+      '<meta name="twitter:card" content="summary_large_image">',
+      '<meta name="twitter:title" content="' + esc(fullTitle) + '">',
+      '<meta name="twitter:description" content="' + esc(summary) + '">',
+      '<meta name="twitter:image" content="' + esc(SHARE_IMAGE) + '">'
+    ];
+    if (article) {
+      seo.push('<meta property="article:published_time" content="' + esc(article.created_at) + '">');
+      if (article.updated_at) seo.push('<meta property="article:modified_time" content="' + esc(article.updated_at) + '">');
+      seo.push('<meta property="article:section" content="' + esc(category.name) + '">');
+    }
+    for (const item of entities) {
+      seo.push('<script type="application/ld+json">' + jsonLD(item) + '</script>');
+    }
     return '<!doctype html>\n<html lang="zh-CN">\n<head>\n' +
       '<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
-      '<title>' + esc(title) + '</title>\n' +
-      '<meta name="description" content="' + esc(description) + '">\n' +
-      '<link rel="canonical" href="' + esc(canonical) + '">\n' +
+      seo.join('\n') + '\n' +
+      '<link rel="icon" type="image/svg+xml" href="' + esc(prefix) + 'favicon.svg">\n' +
       '<link rel="stylesheet" href="' + esc(prefix) + 'style.css">\n' +
       '</head>\n<body>\n<nav aria-label="网站导航">' + navigation(prefix, current, categories) +
-      '</nav>\n<hr>\n<main>\n' + body + '\n</main>\n</body>\n</html>\n';
+      '</nav>\n<hr>\n<main>\n' + body + '\n</main>\n<footer class="site-footer">联系方式：<a href="mailto:y1830959054@gmail.com">y1830959054@gmail.com</a></footer>\n</body>\n</html>\n';
   }
 
   function item(a, prefix, categories, showCategory = true) {
@@ -202,18 +321,32 @@
     }
 
     outputFiles.push(output('index.html', page({
-      title: '文章', description: 'Go、PHP 与前端开发文章',
+      title: SITE_NAME, description: SITE_DESCRIPTION,
       body: itemList(articles, '', lookup), location: 'index.html',
-      current: 'home', categories, baseURL: BASE_URL
+      current: 'home', categories, baseURL: BASE_URL,
+      ld: [
+        { '@type': 'WebSite', '@id': BASE_URL + '#website', url: BASE_URL,
+          name: SITE_NAME, description: SITE_DESCRIPTION, inLanguage: 'zh-CN' },
+        { '@type': 'Blog', '@id': BASE_URL + '#blog', url: BASE_URL,
+          name: SITE_NAME, description: SITE_DESCRIPTION,
+          author: { '@type': 'Person', name: AUTHOR }, inLanguage: 'zh-CN' }
+      ]
     })));
     for (const category of categories) {
       const slug = CATEGORY_SLUGS[category.id];
       const subset = articles.filter(a => a.category_id === category.id);
       const location = 'categories/' + slug + '/index.html';
       outputFiles.push(output(location, page({
-        title: category.name, description: category.name + ' 分类文章',
+        title: category.name,
+        description: SITE_NAME + '收录的' + category.name + '文章，共' + subset.length + '篇。' +
+          (subset.length ? '包括' + subset.slice(0, 3).map(a => a.title).join('、') + '等。' : ''),
         body: '<h1>' + esc(category.name) + '</h1>' + itemList(subset, '../../', lookup, false),
-        location, current: slug, categories, baseURL: BASE_URL
+        location, current: slug, categories, baseURL: BASE_URL,
+        ld: [
+          { '@type': 'CollectionPage', name: category.name + ' | ' + SITE_NAME,
+            url: fullURL(BASE_URL, 'categories/' + slug + '/'), inLanguage: 'zh-CN' },
+          breadcrumbs([[SITE_NAME, BASE_URL], [category.name, fullURL(BASE_URL, 'categories/' + slug + '/')]])
+        ]
       })));
     }
 
@@ -228,9 +361,15 @@
       archive.push('<h2>' + esc(year) + '</h2>', itemList(byYear.get(year), '../', lookup));
     }
     outputFiles.push(output('archive/index.html', page({
-      title: '文章归档', description: '按年份浏览全部文章',
+      title: '文章归档', description: '按年份浏览' + SITE_NAME + '的全部' + articles.length +
+        '篇技术文章，涉及 Go、PHP、Flutter、前端与系统开发。',
       body: archive.join('\n'), location: 'archive/index.html', current: 'archive',
-      categories, baseURL: BASE_URL
+      categories, baseURL: BASE_URL,
+      ld: [
+        { '@type': 'CollectionPage', name: '文章归档 | ' + SITE_NAME,
+          url: fullURL(BASE_URL, 'archive/'), inLanguage: 'zh-CN' },
+        breadcrumbs([[SITE_NAME, BASE_URL], ['文章归档', fullURL(BASE_URL, 'archive/')]])
+      ]
     })));
 
     for (let i = 0; i < articles.length; i++) {
@@ -244,17 +383,31 @@
         renderMarkdown(sourceTexts[i], a.title) + '\n</article>';
       const location = 'articles/' + a.id + '/index.html';
       outputFiles.push(output(location, page({
-        title: a.title, description: a.title + ' - ' + category.name, body,
-        location, current: '', categories, baseURL: BASE_URL
+        title: a.title, description: articleDescription(sourceTexts[i], a.title, category.name), body,
+        location, current: '', categories, baseURL: BASE_URL,
+        type: 'article', article: a, category
       })));
     }
 
     const paths = ['', 'archive/']
       .concat(categories.map(c => 'categories/' + CATEGORY_SLUGS[c.id] + '/'))
       .concat(articles.map(a => 'articles/' + a.id + '/'));
+    // lastmod only uses publication or explicit edit timestamps, never build time.
+    const modified = a => a.updated_at || a.created_at;
+    const latest = subset => subset.reduce((last, a) => modified(a) > last ? modified(a) : last, '');
+    const dates = new Map([
+      ['', latest(articles)],
+      ['archive/', latest(articles)],
+      ...categories.map(c => [
+        'categories/' + CATEGORY_SLUGS[c.id] + '/',
+        latest(articles.filter(a => a.category_id === c.id))
+      ]),
+      ...articles.map(a => ['articles/' + a.id + '/', modified(a)])
+    ]);
     const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
       '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
-      paths.map(p => '<url><loc>' + esc(fullURL(BASE_URL, p)) + '</loc></url>').join('') +
+      paths.map(p => '<url><loc>' + esc(fullURL(BASE_URL, p)) + '</loc>' +
+        (dates.get(p) ? '<lastmod>' + esc(dates.get(p)) + '</lastmod>' : '') + '</url>').join('') +
       '</urlset>\n';
     outputFiles.push(output('sitemap.xml', xml));
     outputFiles.push(output('robots.txt', 'User-agent: *\nAllow: /\nSitemap: ' + fullURL(BASE_URL, 'sitemap.xml') + '\n'));
@@ -272,6 +425,6 @@
 
   globalThis.BlogStatic = Object.freeze({
     readText, writeText, readMetadata, loadProject, readArticle, saveArticle,
-    renderMarkdown, buildSite, CATEGORY_SLUGS, BASE_URL
+    renderMarkdown, buildSite, articleDescription, CATEGORY_SLUGS, BASE_URL, SITE_NAME
   });
 })();

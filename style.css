@@ -6,6 +6,9 @@ html { -webkit-text-size-adjust: 100%; }
 body {
   width: 100%;
   max-width: 1040px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   padding: 0 18px 36px;
   margin: 24px auto;
   color: #1b1b1b;
@@ -19,6 +22,9 @@ a:focus-visible { outline: 2px solid #0000bb; outline-offset: 2px; }
 nav { font-size: 14px; line-height: 1.8; }
 nav a { display: inline-block; margin-right: 18px; }
 nav a[aria-current="page"] { color: #111; font-weight: bold; text-decoration: none; }
+main { flex: 1 0 auto; }
+.site-footer { margin-top: 36px; padding-top: 12px; border-top: 1px solid #ddd; color: #666; font-size: 13px; }
+.site-footer a { overflow-wrap: anywhere; }
 hr { border: 0; border-top: 1px solid #bcbcbc; margin: 16px 0 24px; }
 h1 { margin: 20px 0 14px; font-size: 30px; font-weight: 700; line-height: 1.3; }
 h2 { font-size: 21px; margin: 24px 0 12px; line-height: 1.35; }

@@ -3,9 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>interface{} 断言</title>
-<meta name="description" content="interface{} 断言 - Go">
+<title>interface{} 断言 | yinjiaming的博客</title>
+<meta name="description" content="interface{} 代表任意类型，也是 any 的别称，需要做转换才能使用，golang提供了类型断言来实现这类转换 x.(T) 其实就是判断 T 是否实现了 x 接口，如果实现了，就把 x 接口类型具体化为 T 类型 x.(type) 这种方式的类型断言，就只能和 switch 搭配使用，因为它需要和…">
+<meta name="author" content="yinjiaming">
 <link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/69/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="yinjiaming的博客">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="interface{} 断言 | yinjiaming的博客">
+<meta property="og:description" content="interface{} 代表任意类型，也是 any 的别称，需要做转换才能使用，golang提供了类型断言来实现这类转换 x.(T) 其实就是判断 T 是否实现了 x 接口，如果实现了，就把 x 接口类型具体化为 T 类型 x.(type) 这种方式的类型断言，就只能和 switch 搭配使用，因为它需要和…">
+<meta property="og:url" content="https://yinjiaming666.github.io/blog/articles/69/">
+<meta property="og:image" content="https://yinjiaming666.github.io/blog/social-card.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="yinjiaming的博客">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="interface{} 断言 | yinjiaming的博客">
+<meta name="twitter:description" content="interface{} 代表任意类型，也是 any 的别称，需要做转换才能使用，golang提供了类型断言来实现这类转换 x.(T) 其实就是判断 T 是否实现了 x 接口，如果实现了，就把 x 接口类型具体化为 T 类型 x.(type) 这种方式的类型断言，就只能和 switch 搭配使用，因为它需要和…">
+<meta name="twitter:image" content="https://yinjiaming666.github.io/blog/social-card.png">
+<meta property="article:published_time" content="2023-02-26T13:27:52+08:00">
+<meta property="article:section" content="Go">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"interface{} 断言","description":"interface{} 代表任意类型，也是 any 的别称，需要做转换才能使用，golang提供了类型断言来实现这类转换 x.(T) 其实就是判断 T 是否实现了 x 接口，如果实现了，就把 x 接口类型具体化为 T 类型 x.(type) 这种方式的类型断言，就只能和 switch 搭配使用，因为它需要和…","url":"https://yinjiaming666.github.io/blog/articles/69/","mainEntityOfPage":{"@type":"WebPage","@id":"https://yinjiaming666.github.io/blog/articles/69/"},"datePublished":"2023-02-26T13:27:52+08:00","author":{"@type":"Person","name":"yinjiaming"},"publisher":{"@type":"Person","name":"yinjiaming"},"image":"https://yinjiaming666.github.io/blog/social-card.png","articleSection":"Go","inLanguage":"zh-CN","isPartOf":{"@id":"https://yinjiaming666.github.io/blog/#blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"yinjiaming的博客","item":"https://yinjiaming666.github.io/blog/"},{"@type":"ListItem","position":2,"name":"Go","item":"https://yinjiaming666.github.io/blog/categories/go/"},{"@type":"ListItem","position":3,"name":"interface{} 断言","item":"https://yinjiaming666.github.io/blog/articles/69/"}]}</script>
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -58,5 +79,6 @@ func main() {
 
 </article>
 </main>
+<footer class="site-footer">联系方式：<a href="mailto:y1830959054@gmail.com">y1830959054@gmail.com</a></footer>
 </body>
 </html>
