@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Golang redis 分布式锁 | yinjiaming的博客</title>
+<meta name="description" content="通过 Redis Lua 脚本保证原子性，使用 EXISTS 检查锁、PSETEX 设置带 TTL 的锁，每 10 秒通过 GET 校验 Token 并使用 PEXPIRE 续约 30 秒，续约失败则取消业务 Context，执行结束后通过 GET 校验所有权并使用 DEL 安全释放锁，避免误删其他请求的锁。">
+<meta name="author" content="yinjiaming">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/131/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="yinjiaming的博客">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="Golang redis 分布式锁 | yinjiaming的博客">
+<meta property="og:description" content="通过 Redis Lua 脚本保证原子性，使用 EXISTS 检查锁、PSETEX 设置带 TTL 的锁，每 10 秒通过 GET 校验 Token 并使用 PEXPIRE 续约 30 秒，续约失败则取消业务 Context，执行结束后通过 GET 校验所有权并使用 DEL 安全释放锁，避免误删其他请求的锁。">
+<meta property="og:url" content="https://yinjiaming666.github.io/blog/articles/131/">
+<meta property="og:image" content="https://yinjiaming666.github.io/blog/social-card.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="yinjiaming的博客">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Golang redis 分布式锁 | yinjiaming的博客">
+<meta name="twitter:description" content="通过 Redis Lua 脚本保证原子性，使用 EXISTS 检查锁、PSETEX 设置带 TTL 的锁，每 10 秒通过 GET 校验 Token 并使用 PEXPIRE 续约 30 秒，续约失败则取消业务 Context，执行结束后通过 GET 校验所有权并使用 DEL 安全释放锁，避免误删其他请求的锁。">
+<meta name="twitter:image" content="https://yinjiaming666.github.io/blog/social-card.png">
+<meta property="article:published_time" content="2026-10-22T18:25:30+08:00">
+<meta property="article:section" content="Go">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Golang redis 分布式锁","description":"通过 Redis Lua 脚本保证原子性，使用 EXISTS 检查锁、PSETEX 设置带 TTL 的锁，每 10 秒通过 GET 校验 Token 并使用 PEXPIRE 续约 30 秒，续约失败则取消业务 Context，执行结束后通过 GET 校验所有权并使用 DEL 安全释放锁，避免误删其他请求的锁。","url":"https://yinjiaming666.github.io/blog/articles/131/","mainEntityOfPage":{"@type":"WebPage","@id":"https://yinjiaming666.github.io/blog/articles/131/"},"datePublished":"2026-10-22T18:25:30+08:00","author":{"@type":"Person","name":"yinjiaming"},"publisher":{"@type":"Person","name":"yinjiaming"},"image":"https://yinjiaming666.github.io/blog/social-card.png","articleSection":"Go","inLanguage":"zh-CN","isPartOf":{"@id":"https://yinjiaming666.github.io/blog/#blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"yinjiaming的博客","item":"https://yinjiaming666.github.io/blog/"},{"@type":"ListItem","position":2,"name":"Go","item":"https://yinjiaming666.github.io/blog/categories/go/"},{"@type":"ListItem","position":3,"name":"Golang redis 分布式锁","item":"https://yinjiaming666.github.io/blog/articles/131/"}]}</script>
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <a href="../../archive/index.html">归档</a> <a href="../../categories/notes/index.html">随笔</a> <a href="../../categories/php/index.html">PHP</a> <a href="../../categories/go/index.html">Go</a> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<h1>Golang redis 分布式锁</h1><p class="post-meta"><time datetime="2026-10-22">2026-10-22</time> · <a href="../../categories/go/index.html">Go</a></p><article class="prose">
+<blockquote>
+<p>通过 Redis Lua 脚本保证原子性，使用 EXISTS 检查锁、PSETEX 设置带 TTL 的锁，每 10 秒通过 GET 校验 Token 并使用 PEXPIRE 续约
+30 秒，续约失败则取消业务 Context，执行结束后通过 GET 校验所有权并使用 DEL 安全释放锁，避免误删其他请求的锁。</p>
+</blockquote>
+<h2>代码</h2>
+<pre><code class="language-golang">// Package redislock coordinates cooperating writers. SQL transactions, unique
+// constraints and conditional updates remain the authority for persisted data.
+package redislock
+
+import (
+	&quot;context&quot;
+	&quot;crypto/rand&quot;
+	&quot;encoding/hex&quot;
+	&quot;errors&quot;
+	&quot;fmt&quot;
+	&quot;sort&quot;
+	&quot;strings&quot;
+	&quot;time&quot;
+
+	redis &quot;github.com/redis/go-redis/v9&quot;
+)
+
+var (
+	ErrBusy      = errors.New(&quot;redis resources remain locked&quot;)
+	ErrLostLease = errors.New(&quot;redis lock lease was lost&quot;)
+)
+
+const acquireScript = `
+for _, key in ipairs(KEYS) do
+ if redis.call(&#39;EXISTS&#39;, key) ~= 0 then return 0 end
+end
+for _, key in ipairs(KEYS) do redis.call(&#39;PSETEX&#39;, key, ARGV[2], ARGV[1]) end
+return 1`
+const renewScript = `
+for _, key in ipairs(KEYS) do
+ if redis.call(&#39;GET&#39;, key) ~= ARGV[1] then return 0 end
+end
+for _, key in ipairs(KEYS) do redis.call(&#39;PEXPIRE&#39;, key, ARGV[2]) end
+return 1`
+const checkScript = `
+for _, key in ipairs(KEYS) do
+ if redis.call(&#39;GET&#39;, key) ~= ARGV[1] then return 0 end
+end
+return 1`
+const releaseScript = `
+for _, key in ipairs(KEYS) do
+ if redis.call(&#39;GET&#39;, key) == ARGV[1] then redis.call(&#39;DEL&#39;, key) end
+end
+return 1`
+
+// Manager uses one Redis server and automatically renews a bounded lease.
+// Resource names must describe every resource changed by the callback. They are
+// sorted and acquired atomically, so callers cannot deadlock on reversed orders.
+type Manager struct {
+	client                                            *redis.Client
+	prefix                                            string
+	ttl, renewInterval, wait, retry, operationTimeout time.Duration
+	totalTimeout                                      time.Duration
+}
+
+func New(client *redis.Client, prefix string) (*Manager, error) {
+	if client == nil {
+		return nil, errors.New(&quot;redis lock client is nil&quot;)
+	}
+	prefix = strings.TrimSpace(prefix)
+	if prefix == &quot;&quot; {
+		return nil, errors.New(&quot;redis lock prefix is empty&quot;)
+	}
+	// WithTimeout clones the options and shares the caller-owned connection pool.
+	// Respect short operation contexts even when the original general-purpose
+	// client ignores deadlines. One attempt avoids ambiguous EVAL retransmission.
+	bounded := client.WithTimeout(2 * time.Second)
+	bounded.Options().ContextTimeoutEnabled = true
+	bounded.Options().MaxRetries = 0
+	return &amp;Manager{client: bounded, prefix: strings.TrimRight(prefix, &quot;:&quot;) + &quot;:&quot;, ttl: 30 * time.Second, renewInterval: 10 * time.Second, wait: 5 * time.Second, retry: 25 * time.Millisecond, operationTimeout: 2 * time.Second, totalTimeout: 30 * time.Second}, nil
+}
+
+type leaseKey struct{}
+type lease struct {
+	manager *Manager
+	keys    []string
+	token   string
+	ctx     context.Context
+	cancel  context.CancelCauseFunc
+}
+
+func (m *Manager) resourceKeys(resources []string) ([]string, error) {
+	if m == nil || m.client == nil {
+		return nil, errors.New(&quot;redis lock manager is nil&quot;)
+	}
+	unique := make(map[string]struct{}, len(resources))
+	for _, resource := range resources {
+		if strings.TrimSpace(resource) == &quot;&quot; {
+			return nil, errors.New(&quot;redis lock resource is empty&quot;)
+		}
+		unique[m.prefix+resource] = struct{}{}
+	}
+	if len(unique) == 0 {
+		return nil, errors.New(&quot;redis lock resources are empty&quot;)
+	}
+	keys := make([]string, 0, len(unique))
+	for key := range unique {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys, nil
+}
+
+// With applies one total deadline to acquisition and the callback. An earlier
+// parent deadline wins. Timeout cancels the callback and stops renewal; explicit
+// release waits for the callback to return. A callback that ignores cancellation
+// can outlive its expiring lease, so callbacks must honor ctx and call Check
+// immediately before committing side effects. Redis alone cannot fence MySQL.
+func (m *Manager) With(ctx context.Context, resources []string, fn func(context.Context) error) error {
+	if m == nil {
+		return errors.New(&quot;redis lock manager is nil&quot;)
+	}
+	if m.totalTimeout &lt;= 0 {
+		return errors.New(&quot;redis lock total timeout must be positive&quot;)
+	}
+	ctx, cancelTotal := context.WithTimeout(ctx, m.totalTimeout)
+	defer cancelTotal()
+	if fn == nil {
+		return errors.New(&quot;redis lock callback is nil&quot;)
+	}
+	keys, err := m.resourceKeys(resources)
+	if err != nil {
+		return err
+	}
+	if err = ctx.Err(); err != nil {
+		return err
+	}
+	random := make([]byte, 24)
+	if _, err = rand.Read(random); err != nil {
+		return fmt.Errorf(&quot;create Redis lock token: %w&quot;, err)
+	}
+	token := hex.EncodeToString(random)
+	if err = m.acquire(ctx, keys, token); err != nil {
+		return err
+	}
+	callbackContext, cancel := context.WithCancelCause(ctx)
+	held := &amp;lease{manager: m, keys: keys, token: token, ctx: callbackContext, cancel: cancel}
+	callbackContext = context.WithValue(callbackContext, leaseKey{}, held)
+	stop, done := make(chan struct{}), make(chan struct{})
+	go held.renew(stop, done)
+	// Cleanup also runs when a callback panics. Token comparison never releases a
+	// successor&#39;s lease, even if this callback outlived its TTL.
+	defer func() {
+		close(stop)
+		cancel(context.Canceled)
+		&lt;-done
+		cleanup, cancelCleanup := context.WithTimeout(context.Background(), m.operationTimeout)
+		defer cancelCleanup()
+		_ = m.client.Eval(cleanup, releaseScript, keys, token).Err()
+	}()
+	if callbackContext.Err() != nil {
+		return context.Cause(callbackContext)
+	}
+	err = fn(callbackContext)
+	return errors.Join(err, Check(callbackContext))
+}
+
+func (m *Manager) acquire(ctx context.Context, keys []string, token string) error {
+	waiting, cancel := context.WithTimeout(ctx, m.wait)
+	defer cancel()
+	for {
+		if err := waiting.Err(); err != nil {
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			return fmt.Errorf(&quot;%w: %w&quot;, ErrBusy, err)
+		}
+		operation, cancelOperation := context.WithTimeout(waiting, m.operationTimeout)
+		acquired, err := m.client.Eval(operation, acquireScript, keys, token, m.ttl.Milliseconds()).Int64()
+		cancelOperation()
+		if err != nil {
+			// A lost reply may mean SET succeeded. Only this token may be cleaned up.
+			cleanup, cancelCleanup := context.WithTimeout(context.Background(), m.operationTimeout)
+			_ = m.client.Eval(cleanup, releaseScript, keys, token).Err()
+			cancelCleanup()
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			if waiting.Err() != nil {
+				return fmt.Errorf(&quot;%w: %w&quot;, ErrBusy, waiting.Err())
+			}
+			return fmt.Errorf(&quot;acquire Redis resources: %w&quot;, err)
+		}
+		if acquired == 1 {
+			return nil
+		}
+		timer := time.NewTimer(m.retry)
+		select {
+		case &lt;-waiting.Done():
+			timer.Stop()
+		case &lt;-timer.C:
+		}
+	}
+}
+
+func (l *lease) renew(stop &lt;-chan struct{}, done chan&lt;- struct{}) {
+	defer close(done)
+	ticker := time.NewTicker(l.manager.renewInterval)
+	defer ticker.Stop()
+	for {
+		select {
+		case &lt;-stop:
+			return
+		case &lt;-l.ctx.Done():
+			return
+		case &lt;-ticker.C:
+			operation, cancel := context.WithTimeout(l.ctx, l.manager.operationTimeout)
+			renewed, err := l.manager.client.Eval(operation, renewScript, l.keys, l.token, l.manager.ttl.Milliseconds()).Int64()
+			cancel()
+			if err != nil || renewed != 1 {
+				l.cancel(errors.Join(ErrLostLease, err))
+				return
+			}
+		}
+	}
+}
+
+// Check verifies ownership using the callback context. It also works outside a
+// lease, allowing transaction helpers to retain their ordinary context checks.
+func Check(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return context.Cause(ctx)
+	}
+	held, _ := ctx.Value(leaseKey{}).(*lease)
+	if held == nil {
+		return nil
+	}
+	operation, cancel := context.WithTimeout(ctx, held.manager.operationTimeout)
+	owned, err := held.manager.client.Eval(operation, checkScript, held.keys, held.token).Int64()
+	cancel()
+	if err != nil || owned != 1 {
+		failure := errors.Join(ErrLostLease, err)
+		held.cancel(failure)
+		return failure
+	}
+	if ctx.Err() != nil {
+		return context.Cause(ctx)
+	}
+	return nil
+}
+</code></pre>
+<h2>调用</h2>
+<pre><code>	if store.locks == nil {
+		return store.setCP(ctx, request, saved, checkpoint)
+	}
+	// Acquire both user resources before opening SQL; the common manager sorts them.
+	err = store.locks.With(ctx, []string{&quot;member:&quot; + request.User1, &quot;member:&quot; + request.User2}, func(locked context.Context) error {
+		var writeErr error
+		result, writeErr = store.setCP(locked, request, saved, checkpoint)
+		return writeErr
+	})
+	return result, err
+</code></pre>
+
+</article>
+</main>
+<footer class="site-footer">联系方式：<a href="mailto:y1830959054@gmail.com">y1830959054@gmail.com</a></footer>
+</body>
+</html>
