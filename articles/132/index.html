@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MySQL ON DUPLICATE KEY UPDATE 用法 | yinjiaming的博客</title>
+<meta name="description" content="作用：存在更新不存在插入(upsert)。性能一般会比先 select 后 update/insert 要好 只有以下约束发生冲突时，才会执行 ON DUPLICATE KEY UPDATE： 普通索引（INDEX / KEY）不会触发更新。 (owner_uid, room_id) 的组合不能重复，但两个…">
+<meta name="author" content="yinjiaming">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/132/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="yinjiaming的博客">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="MySQL ON DUPLICATE KEY UPDATE 用法 | yinjiaming的博客">
+<meta property="og:description" content="作用：存在更新不存在插入(upsert)。性能一般会比先 select 后 update/insert 要好 只有以下约束发生冲突时，才会执行 ON DUPLICATE KEY UPDATE： 普通索引（INDEX / KEY）不会触发更新。 (owner_uid, room_id) 的组合不能重复，但两个…">
+<meta property="og:url" content="https://yinjiaming666.github.io/blog/articles/132/">
+<meta property="og:image" content="https://yinjiaming666.github.io/blog/social-card.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="yinjiaming的博客">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MySQL ON DUPLICATE KEY UPDATE 用法 | yinjiaming的博客">
+<meta name="twitter:description" content="作用：存在更新不存在插入(upsert)。性能一般会比先 select 后 update/insert 要好 只有以下约束发生冲突时，才会执行 ON DUPLICATE KEY UPDATE： 普通索引（INDEX / KEY）不会触发更新。 (owner_uid, room_id) 的组合不能重复，但两个…">
+<meta name="twitter:image" content="https://yinjiaming666.github.io/blog/social-card.png">
+<meta property="article:published_time" content="2026-10-27T11:09:49+08:00">
+<meta property="article:section" content="随笔">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"MySQL ON DUPLICATE KEY UPDATE 用法","description":"作用：存在更新不存在插入(upsert)。性能一般会比先 select 后 update/insert 要好 只有以下约束发生冲突时，才会执行 ON DUPLICATE KEY UPDATE： 普通索引（INDEX / KEY）不会触发更新。 (owner_uid, room_id) 的组合不能重复，但两个…","url":"https://yinjiaming666.github.io/blog/articles/132/","mainEntityOfPage":{"@type":"WebPage","@id":"https://yinjiaming666.github.io/blog/articles/132/"},"datePublished":"2026-10-27T11:09:49+08:00","author":{"@type":"Person","name":"yinjiaming"},"publisher":{"@type":"Person","name":"yinjiaming"},"image":"https://yinjiaming666.github.io/blog/social-card.png","articleSection":"随笔","inLanguage":"zh-CN","isPartOf":{"@id":"https://yinjiaming666.github.io/blog/#blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"yinjiaming的博客","item":"https://yinjiaming666.github.io/blog/"},{"@type":"ListItem","position":2,"name":"随笔","item":"https://yinjiaming666.github.io/blog/categories/notes/"},{"@type":"ListItem","position":3,"name":"MySQL ON DUPLICATE KEY UPDATE 用法","item":"https://yinjiaming666.github.io/blog/articles/132/"}]}</script>
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <a href="../../archive/index.html">归档</a> <a href="../../categories/notes/index.html">随笔</a> <a href="../../categories/php/index.html">PHP</a> <a href="../../categories/go/index.html">Go</a> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<h1>MySQL ON DUPLICATE KEY UPDATE 用法</h1><p class="post-meta"><time datetime="2026-10-27">2026-10-27</time> · <a href="../../categories/notes/index.html">随笔</a></p><article class="prose">
+<h1>MySQL <code>ON DUPLICATE KEY UPDATE</code> 用法</h1>
+<blockquote>
+<p>作用：存在更新不存在插入(upsert)。性能一般会比先 <code>select</code> 后 <code>update/insert</code> 要好</p>
+</blockquote>
+<h2>1. 触发条件</h2>
+<p>只有以下约束发生冲突时，才会执行 <code>ON DUPLICATE KEY UPDATE</code>：</p>
+<ul>
+<li><strong>主键（<code>PRIMARY KEY</code>）</strong></li>
+<li><strong>唯一索引（<code>UNIQUE KEY</code>）</strong>，包括联合唯一索引</li>
+</ul>
+<p>普通索引（<code>INDEX</code> / <code>KEY</code>）<strong>不会触发更新</strong>。</p>
+<h2>2. 联合唯一索引</h2>
+<p>以房间等级进度表为例：</p>
+<pre><code class="language-sql">CREATE TABLE s_room_level_progress (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    owner_uid BIGINT UNSIGNED NOT NULL,
+    room_id BIGINT UNSIGNED NOT NULL,
+    exp INT NOT NULL DEFAULT 0,
+    UNIQUE KEY uk_owner_room (owner_uid, room_id)
+) ENGINE=InnoDB;
+</code></pre>
+<p><code>(owner_uid, room_id)</code> 的组合不能重复，但两个字段单独重复是允许的。</p>
+<pre><code class="language-sql">INSERT INTO s_room_level_progress (owner_uid, room_id, exp)
+VALUES (1001, 2001, 100)
+ON DUPLICATE KEY UPDATE
+    exp = 100;
+</code></pre>
+<ul>
+<li>组合不存在：插入新记录。</li>
+<li>组合已存在：更新原记录的 <code>exp</code>。</li>
+<li>联合唯一索引只有两个字段，不影响插入三个或更多字段。</li>
+</ul>
+<p>已有表添加联合唯一索引：</p>
+<pre><code class="language-sql">ALTER TABLE s_room_level_progress
+ADD UNIQUE KEY uk_owner_room (owner_uid, room_id);
+</code></pre>
+<p>添加前需要确保不存在重复组合。</p>
+<h2>3. 常用写法</h2>
+<p><strong>冲突时更新：</strong></p>
+<pre><code class="language-sql">INSERT INTO s_room_level_progress (owner_uid, room_id, exp)
+VALUES (1001, 2001, 1)
+ON DUPLICATE KEY UPDATE exp = exp + 1;
+</code></pre>
+<p><strong>只保证记录存在，不需要更新：</strong></p>
+<pre><code class="language-sql">INSERT IGNORE INTO s_room_level_progress (owner_uid, room_id)
+VALUES (1001, 2001);
+</code></pre>
+<p>注意：<code>INSERT IGNORE</code> 也可能将部分其他错误转为警告。</p>
+<p><code>ON DUPLICATE KEY UPDATE</code> 后面不能留空，必须有赋值表达式。</p>
+<h2>4. 性能与注意事项</h2>
+<ul>
+<li>单条 SQL 完成插入或更新，通常比先查询再写入效率更高。</li>
+<li>大量并发更新同一条记录时，可能出现锁等待。</li>
+<li>多个唯一索引中的任意一个发生冲突，都可能触发更新。</li>
+<li>使用自增主键时，冲突更新也可能消耗自增 ID。</li>
+</ul>
+<p><strong>结论：</strong> 如果业务唯一标识是 <code>(owner_uid, room_id)</code>，应建立 <code>UNIQUE KEY (owner_uid, room_id)</code>，而不是普通联合索引。插入第三个字段 <code>exp</code> 不受影响。</p>
+
+</article>
+</main>
+<footer class="site-footer">联系方式：<a href="mailto:y1830959054@gmail.com">y1830959054@gmail.com</a></footer>
+</body>
+</html>

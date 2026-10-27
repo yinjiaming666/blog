@@ -19,6 +19,15 @@
   ],
   "articles": [
     {
+      "id": 132,
+      "title": "MySQL ON DUPLICATE KEY UPDATE 用法",
+      "category_id": 1,
+      "created_at": "2026-10-27T11:09:49+08:00",
+      "unix_time": 1793070589,
+      "source": "content/posts/132.md",
+      "original_format": "markdown"
+    },
+    {
       "id": 131,
       "title": "Golang redis 分布式锁",
       "category_id": 3,
