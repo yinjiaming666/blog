@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>记一次 MySQL 数据库死锁问题 | yinjiaming的博客</title>
+<meta name="description" content="s_member 表的主键 id 使用 VARCHAR(255) 类型存储，但在执行 SQL 时，查询条件传入的是数字： 由于 id 是字符串类型，而 33600134 是数值类型，MySQL 会进行 隐式类型转换，导致主键索引无法正常用于精确查找。 在这种情况下，MySQL 可能执行全索引扫描或全表扫描。…">
+<meta name="author" content="yinjiaming">
+<link rel="canonical" href="https://yinjiaming666.github.io/blog/articles/133/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="yinjiaming的博客">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="记一次 MySQL 数据库死锁问题 | yinjiaming的博客">
+<meta property="og:description" content="s_member 表的主键 id 使用 VARCHAR(255) 类型存储，但在执行 SQL 时，查询条件传入的是数字： 由于 id 是字符串类型，而 33600134 是数值类型，MySQL 会进行 隐式类型转换，导致主键索引无法正常用于精确查找。 在这种情况下，MySQL 可能执行全索引扫描或全表扫描。…">
+<meta property="og:url" content="https://yinjiaming666.github.io/blog/articles/133/">
+<meta property="og:image" content="https://yinjiaming666.github.io/blog/social-card.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="yinjiaming的博客">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="记一次 MySQL 数据库死锁问题 | yinjiaming的博客">
+<meta name="twitter:description" content="s_member 表的主键 id 使用 VARCHAR(255) 类型存储，但在执行 SQL 时，查询条件传入的是数字： 由于 id 是字符串类型，而 33600134 是数值类型，MySQL 会进行 隐式类型转换，导致主键索引无法正常用于精确查找。 在这种情况下，MySQL 可能执行全索引扫描或全表扫描。…">
+<meta name="twitter:image" content="https://yinjiaming666.github.io/blog/social-card.png">
+<meta property="article:published_time" content="2026-10-27T14:46:36+08:00">
+<meta property="article:section" content="随笔">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"记一次 MySQL 数据库死锁问题","description":"s_member 表的主键 id 使用 VARCHAR(255) 类型存储，但在执行 SQL 时，查询条件传入的是数字： 由于 id 是字符串类型，而 33600134 是数值类型，MySQL 会进行 隐式类型转换，导致主键索引无法正常用于精确查找。 在这种情况下，MySQL 可能执行全索引扫描或全表扫描。…","url":"https://yinjiaming666.github.io/blog/articles/133/","mainEntityOfPage":{"@type":"WebPage","@id":"https://yinjiaming666.github.io/blog/articles/133/"},"datePublished":"2026-10-27T14:46:36+08:00","author":{"@type":"Person","name":"yinjiaming"},"publisher":{"@type":"Person","name":"yinjiaming"},"image":"https://yinjiaming666.github.io/blog/social-card.png","articleSection":"随笔","inLanguage":"zh-CN","isPartOf":{"@id":"https://yinjiaming666.github.io/blog/#blog"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"yinjiaming的博客","item":"https://yinjiaming666.github.io/blog/"},{"@type":"ListItem","position":2,"name":"随笔","item":"https://yinjiaming666.github.io/blog/categories/notes/"},{"@type":"ListItem","position":3,"name":"记一次 MySQL 数据库死锁问题","item":"https://yinjiaming666.github.io/blog/articles/133/"}]}</script>
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<nav aria-label="网站导航"><a href="../../index.html">首页</a> <a href="../../archive/index.html">归档</a> <a href="../../categories/notes/index.html">随笔</a> <a href="../../categories/php/index.html">PHP</a> <a href="../../categories/go/index.html">Go</a> <a href="../../categories/frontend/index.html">前端</a></nav>
+<hr>
+<main>
+<h1>记一次 MySQL 数据库死锁问题</h1><p class="post-meta"><time datetime="2026-10-27">2026-10-27</time> · <a href="../../categories/notes/index.html">随笔</a></p><article class="prose">
+<h3>问题原因</h3>
+<p><code>s_member</code> 表的主键 <code>id</code> 使用 <code>VARCHAR(255)</code> 类型存储，但在执行 SQL 时，查询条件传入的是数字：</p>
+<pre><code class="language-sql">SELECT id
+FROM s_member
+WHERE id = 33600134
+    FOR UPDATE;
+</code></pre>
+<p>由于 <code>id</code> 是字符串类型，而 <code>33600134</code> 是数值类型，MySQL 会进行 <strong>隐式类型转换</strong>，导致主键索引无法正常用于精确查找。</p>
+<p>在这种情况下，MySQL 可能执行全索引扫描或全表扫描。配合 <code>FOR UPDATE</code> 使用时，InnoDB
+可能锁定大量甚至全部扫描记录，而不是仅锁定目标行，从而扩大锁范围，增加锁冲突和死锁的风险。</p>
+<h3>正确写法</h3>
+<pre><code class="language-sql">SELECT id
+FROM s_member
+WHERE id = &#39;33600134&#39;
+    FOR UPDATE;
+</code></pre>
+<p>确保查询参数与字段类型一致，使 MySQL 能够利用主键索引进行精确查找，避免不必要的大范围加锁。</p>
+<h3>总结</h3>
+<p><strong>字段类型与查询参数类型不一致，不仅可能造成索引失效和性能下降，在 <code>FOR UPDATE</code>
+等加锁场景下，还可能扩大锁范围，引发严重的锁竞争和死锁问题。</strong></p>
+<p>对于 <code>VARCHAR</code> 类型的主键，应始终使用字符串参数进行查询。</p>
+
+</article>
+</main>
+<footer class="site-footer">联系方式：<a href="mailto:y1830959054@gmail.com">y1830959054@gmail.com</a></footer>
+</body>
+</html>
